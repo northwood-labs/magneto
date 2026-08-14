@@ -2,7 +2,7 @@
 
 Magneto is an **adversarial citation gate** agent, named after Erik Lehnsherr (aka _Magneto_) from the X-Men universe, and an old friend/adversary of Professor X (aka _Charles Xavier_).
 
-[IMAGE]
+<img width="1920" height="818" alt="old-friend" src="https://github.com/user-attachments/assets/aeaaf796-153b-481d-b325-f45074eff138" />
 
 > [!IMPORTANT]
 > **This is an experiment.** We expect that there will be lots of changes and improvements as we use it and dial-in a useful workflow. YMMV. At present, there should be no expectation of support.
