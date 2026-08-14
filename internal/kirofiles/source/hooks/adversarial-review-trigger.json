@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Adversarial Review Trigger",
+      "trigger": "PostTaskExec",
+      "action": {
+        "type": "agent",
+        "prompt": "A design task has completed. Check if the design artifact has changed. If it has, and it touches a blast-radius domain (auth, secrets, payments, data-integrity, irreversible-actions), run the adversarial review agent against the updated design document using the citation-gate MCP server to validate findings."
+      }
+    }
+  ]
+}

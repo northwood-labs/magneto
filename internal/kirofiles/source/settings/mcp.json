@@ -1,0 +1,8 @@
+{
+  "command": "magneto",
+  "args": ["serve"],
+  "env": {
+    "WORKSPACE_ROOT": "${workspaceFolder}"
+  },
+  "disabled": false
+}

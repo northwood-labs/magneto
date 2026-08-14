@@ -1,0 +1,22 @@
+#-------------------------------------------------------------------------------
+# KIRO PROMPTS
+
+[[files]]
+  stub        = 'configs/stubs/.kiro/steering/add-code-comments.md'
+  source      = 'configs/templates/.kiro/steering/add-code-comments.md'
+  destination = '.kiro/steering/add-code-comments.md'
+
+[[files]]
+  stub        = 'configs/stubs/.kiro/steering/comprehensive-and-quickstart.md'
+  source      = 'configs/templates/.kiro/steering/comprehensive-and-quickstart.md'
+  destination = '.kiro/steering/comprehensive-and-quickstart.md'
+
+[[files]]
+  stub        = 'configs/stubs/.kiro/steering/generate-agents-md.md'
+  source      = 'configs/templates/.kiro/steering/generate-agents-md.md'
+  destination = '.kiro/steering/generate-agents-md.md'
+
+[[files]]
+  stub        = 'configs/stubs/.kiro/steering/root-level-readme.md'
+  source      = 'configs/templates/.kiro/steering/root-level-readme.md'
+  destination = '.kiro/steering/root-level-readme.md'
