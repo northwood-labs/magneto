@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), adheres t
 
 ## Unreleased
 
-### :books: Documentation
+### <!-- 0 -->:rocket: Features
 
-* [`ba7b010`](https://github.com/northwood-labs/magneto/commit/ba7b010514682d4c6c415c3218116bc0da170c23): Added an image and updated project status in README.md. ([@skyzyx](https://github.com/skyzyx))
+* [`959392c`](https://github.com/northwood-labs/magneto/commit/959392cb8547fda6192dc42da44db25c9f007898): Added short flags for install command options. ([@skyzyx](https://github.com/skyzyx))
 
 <p>Generated on 2026-08-14.</p>
