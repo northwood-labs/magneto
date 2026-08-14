@@ -44,8 +44,8 @@ var (
 		Use:   "kiro",
 		Short: "Install Kiro integration files",
 		Long: clihelpers.LongHelpText(`
-			Installs Magneto integration files for the Kiro IDE.
-			`),
+		Installs Magneto integration files for the Kiro IDE.
+		`),
 		RunE: func(_ *cobra.Command, _ []string) error {
 			input, inputErr := resolveInstallKiroInput()
 			if inputErr != nil {
@@ -73,13 +73,14 @@ type (
 func init() { // lint:allow_init
 	installCmd.AddCommand(installKiroCmd)
 
-	installKiroCmd.Flags().BoolVar(
+	installKiroCmd.Flags().BoolVarP(
 		&fInstallKiroWorkspace,
 		"workspace",
+		"w",
 		false,
 		"Install to the current working directory",
 	)
-	installKiroCmd.Flags().BoolVar(&fInstallKiroUser, "user", false, "Install to the user's home directory")
+	installKiroCmd.Flags().BoolVarP(&fInstallKiroUser, "user", "u", false, "Install to the user's home directory")
 	installKiroCmd.Flags().StringVarP(
 		&fMCPServerName,
 		"mcp-server-name",

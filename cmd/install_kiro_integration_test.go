@@ -65,6 +65,7 @@ func TestInstallKiro_IntegratesManifestAssets(t *testing.T) {
 	output, installErr := captureInstallKiroStdout(t, func() error {
 		return runInstallKiro(&InstallKiroInput{TargetDir: targetDir, ServerName: defaultMCPServerName})
 	})
+
 	require.NoError(t, installErr)
 	assert.Equal(t, manifestOutputForTest(), output)
 
@@ -81,6 +82,7 @@ func TestInstallKiro_IntegratesManifestAssets(t *testing.T) {
 	_, installErr = captureInstallKiroStdout(t, func() error {
 		return runInstallKiro(&InstallKiroInput{TargetDir: targetDir, ServerName: defaultMCPServerName})
 	})
+
 	require.NoError(t, installErr)
 	assert.Equal(t, firstInstallation, snapshotInstalledManifestForTest(t, targetDir))
 
@@ -101,14 +103,15 @@ func TestInstallKiro_IntegratesManifestAssets(t *testing.T) {
 	assert.Equal(t, []byte("retained legacy guidance"), readKiroFileForTest(t, legacyPath))
 }
 
-// TestProperty_InstallationHasFixedManifestScopeAndContent verifies Property
-// 6: fixed manifest scope and file content integrity.
+// TestProperty_InstallationHasFixedManifestScopeAndContent verifies Property 6:
+// fixed manifest scope and file content integrity.
 //
 // For arbitrary pre-existing asset content and an independently missing-parent
 // target, installation writes only the exact manifest and restores embedded
 // asset bytes. The unlisted source candidate is neither embedded nor written.
 //
-// **Validates: Requirements 3.1, 3.2, 4.1, 4.2, 4.3, 4.4, 5.5, 5.6, 7.1, 7.2, 7.4**.
+// **Validates: Requirements 3.1, 3.2, 4.1, 4.2, 4.3, 4.4, 5.5, 5.6, 7.1, 7.2,
+// 7.4**.
 func TestProperty_InstallationHasFixedManifestScopeAndContent(t *testing.T) {
 	checks := 0
 	propertyRoot := t.TempDir()
