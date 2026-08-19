@@ -139,3 +139,23 @@ These gate later phases but aren't choices — they're things to go confirm befo
 * **Reversibility:** This is the one item in this pass that is genuinely not cheap to reverse — real engineering time lands on top of this choice. It was presented explicitly rather than guessed for that reason.
 
 * **Revisit when:** Phase 2+ scope grows past what a lean custom build comfortably covers, or the verification backlog resolves in favor of an existing tool actually covering meaningful ground.
+
+## Follow-on operational workflow decisions
+
+### D-014: How does phase 1 route findings to the confirmer?
+
+* **Decision:** Phase 1 includes a Confirmer only for high-impact security or correctness findings. A finding is high-impact when its explicit severity is `critical` or `high` and its explicit domain includes `security` or `correctness`.
+
+* **Why:** Criterion satisfaction answers whether a rubric criterion is satisfied; severity and domain answer the independent impact question. Routing on a criterion score, including the prior `score >= 8` proposal, conflates those measures and can route low-impact findings or miss high-impact findings.
+
+* **Reversibility:** High. Severity labels and eligible domains can be calibrated after observing review records without changing the isolation, citation, or advisory invariants.
+
+* **Supersedes:** The Phase 1 roadmap statement that deferred Confirmer to Phase 2 and the design's `score >= 8` routing condition are stale. The follow-on operational workflow requirements are the authoritative Phase 1 routing policy; reconcile the roadmap and design during their next approved update.
+
+### D-015: Is phase 0 baseline collection required before phase 1?
+
+* **Decision:** No. Phase 0 is intentionally skipped.
+
+* **Why:** The operational workflow proceeds without delaying Phase 1 for retrospective baseline collection. Any Phase 3 evaluation lacks a pre-Phase-1 control baseline and must state that limitation rather than presenting causal comparisons as measured.
+
+* **Reversibility:** Low for historical comparison: a pre-Phase-1 control cannot be reconstructed after Phase 1 begins. Future measurement can still establish prospective operational baselines.

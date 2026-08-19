@@ -34,9 +34,9 @@ func TestCheck(t *testing.T) {
 			name: "identical findings non-novel",
 			prior: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "errors are silently ignored",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "errors are silently ignored",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",
@@ -47,9 +47,9 @@ func TestCheck(t *testing.T) {
 			},
 			current: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "errors are silently ignored",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "errors are silently ignored",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",
@@ -64,9 +64,9 @@ func TestCheck(t *testing.T) {
 			name: "subset non-novel",
 			prior: []models.ReviewFinding{
 				{
-					CriterionName: "context-isolation",
-					Score:         3,
-					QuotedExcerpt: "shared state between agents",
+					CriterionName:         "context-isolation",
+					CriterionSatisfaction: 3,
+					QuotedExcerpt:         "shared state between agents",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Components",
@@ -75,9 +75,9 @@ func TestCheck(t *testing.T) {
 					Reasoning: "violates isolation requirement",
 				},
 				{
-					CriterionName: "degradation-handling",
-					Score:         5,
-					QuotedExcerpt: "no fallback specified",
+					CriterionName:         "degradation-handling",
+					CriterionSatisfaction: 5,
+					QuotedExcerpt:         "no fallback specified",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Error handling",
@@ -88,9 +88,9 @@ func TestCheck(t *testing.T) {
 			},
 			current: []models.ReviewFinding{
 				{
-					CriterionName: "context-isolation",
-					Score:         3,
-					QuotedExcerpt: "shared state between agents",
+					CriterionName:         "context-isolation",
+					CriterionSatisfaction: 3,
+					QuotedExcerpt:         "shared state between agents",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Components",
@@ -105,9 +105,9 @@ func TestCheck(t *testing.T) {
 			name: "new criterion novel",
 			prior: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "errors are silently ignored",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "errors are silently ignored",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",
@@ -118,9 +118,9 @@ func TestCheck(t *testing.T) {
 			},
 			current: []models.ReviewFinding{
 				{
-					CriterionName: "security-boundaries",
-					Score:         2,
-					QuotedExcerpt: "no auth check on endpoint",
+					CriterionName:         "security-boundaries",
+					CriterionSatisfaction: 2,
+					QuotedExcerpt:         "no auth check on endpoint",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "API",
@@ -135,9 +135,9 @@ func TestCheck(t *testing.T) {
 			name: "same criterion with new evidence novel",
 			prior: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "errors are silently ignored",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "errors are silently ignored",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",
@@ -148,9 +148,9 @@ func TestCheck(t *testing.T) {
 			},
 			current: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "panic recovery is not handled",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "panic recovery is not handled",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",
@@ -165,9 +165,9 @@ func TestCheck(t *testing.T) {
 			name: "completely different findings novel",
 			prior: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "errors are silently ignored",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "errors are silently ignored",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",
@@ -178,9 +178,9 @@ func TestCheck(t *testing.T) {
 			},
 			current: []models.ReviewFinding{
 				{
-					CriterionName: "data-integrity",
-					Score:         2,
-					QuotedExcerpt: "no transaction boundaries",
+					CriterionName:         "data-integrity",
+					CriterionSatisfaction: 2,
+					QuotedExcerpt:         "no transaction boundaries",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Data models",
@@ -189,9 +189,9 @@ func TestCheck(t *testing.T) {
 					Reasoning: "partial writes possible",
 				},
 				{
-					CriterionName: "observability",
-					Score:         3,
-					QuotedExcerpt: "no metrics or tracing",
+					CriterionName:         "observability",
+					CriterionSatisfaction: 3,
+					QuotedExcerpt:         "no metrics or tracing",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Operations",
@@ -206,9 +206,9 @@ func TestCheck(t *testing.T) {
 			name: "empty current round non-novel",
 			prior: []models.ReviewFinding{
 				{
-					CriterionName: "error-handling",
-					Score:         4,
-					QuotedExcerpt: "errors are silently ignored",
+					CriterionName:         "error-handling",
+					CriterionSatisfaction: 4,
+					QuotedExcerpt:         "errors are silently ignored",
 					ArtifactLocation: models.ArtifactLocation{
 						FilePath:         "design.md",
 						SectionReference: "Architecture",

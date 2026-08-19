@@ -76,13 +76,26 @@ var (
 	// ErrToolExecution indicates the MCP tool execution encountered an error.
 	ErrToolExecution = errors.New("MCP tool execution failed")
 
+	// ErrToolOutcomeAssertion indicates an MCP request attempted to provide a
+	// validation or confirmation result reserved for deterministic processing.
+	ErrToolOutcomeAssertion = errors.New("MCP tool request asserted a validation or confirmation outcome")
+
+	// ErrValidationProvenanceMissing indicates a canonical validation request
+	// did not include the required session and finding correlation data.
+	ErrValidationProvenanceMissing = errors.New("deterministic validation provenance is required")
+
+	// ErrValidationProvenanceMismatch indicates submitted correlation data does
+	// not identify a matching deterministic validation result.
+	ErrValidationProvenanceMismatch = errors.New("deterministic validation provenance does not match this finding")
+
 	// -------------------------------------------------------------------------
 	// Kiro installer errors.
 
 	// ErrFlagRequired indicates a required flag was not provided.
 	ErrFlagRequired = errors.New("required flag not provided")
 
-	// ErrFlagsMutuallyExclusive indicates mutually exclusive flags were both set.
+	// ErrFlagsMutuallyExclusive indicates mutually exclusive flags were both
+	// set.
 	ErrFlagsMutuallyExclusive = errors.New("mutually exclusive flags provided")
 
 	// ErrMCPConfigParse indicates the existing mcp.json contains invalid JSON.

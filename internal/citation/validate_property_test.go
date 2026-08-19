@@ -21,6 +21,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-openapi/testify/assert"
+	"github.com/go-openapi/testify/require"
 	"pgregory.net/rapid"
 
 	"go.nwlabs.dev/magneto/internal/citation"
@@ -57,8 +59,7 @@ func TestProperty_CitationRoundTrip(t *testing.T) {
 			rt.Fatal(writeErr)
 		}
 
-		// Call Validate with the extracted substring and section
-		// reference.
+		// Call Validate with the extracted substring and section reference.
 		result, validateErr := citation.Validate(
 			context.Background(),
 			&citation.ValidateInput{
@@ -163,8 +164,8 @@ func TestProperty_WhitespaceNormalizationPreservesMatch(t *testing.T) {
 		// Use all words as the canonical excerpt.
 		excerpt := body
 
-		// Insert random whitespace between words to create a
-		// modified version of the excerpt.
+		// Insert random whitespace between words to create a modified version
+		// of the excerpt.
 		whitespaceChars := []string{
 			" ",
 			"  ",
@@ -212,9 +213,8 @@ func TestProperty_WhitespaceNormalizationPreservesMatch(t *testing.T) {
 			rt.Fatal(validateErr)
 		}
 
-		// Property: whitespace normalization should still find
-		// the match because both excerpt and content normalize
-		// to the same words.
+		// Property: whitespace normalization should still find the match
+		// because both excerpt and content normalize to the same words.
 		if !result.Valid {
 			rt.Fatalf(
 				"expected Valid=true for whitespace-modified excerpt %q (original: %q) in section %q, got failure: %s",
@@ -224,5 +224,125 @@ func TestProperty_WhitespaceNormalizationPreservesMatch(t *testing.T) {
 				result.FailureReason,
 			)
 		}
+	})
+}
+
+// TestProperty6_NormalizedQuotationMatchingInvariantUnderWhitespace verifies
+// Property 6: Normalized quotation matching is invariant under whitespace
+// variation.
+//
+// For any quoted excerpt and cited section that differ only by runs of
+// whitespace, deterministic citation validation returns the same successful
+// match result as validation of the original text.
+//
+// Feature: adversarial-review-operational-workflow, Property 6: Normalized
+// quotation matching is invariant under whitespace variation
+//
+// **Validates: Requirements 4.2**.
+func TestProperty6_NormalizedQuotationMatchingInvariantUnderWhitespace(t *testing.T) {
+	rapid.Check(t, func(rt *rapid.T) {
+		// Generate a heading for the Markdown section.
+		heading := rapid.StringMatching(`[A-Z][a-z]{3,15}`).Draw(rt, "heading")
+
+		// Generate a multi-word body (3-10 words of
+		// non-whitespace characters).
+		wordCount := rapid.IntRange(3, 10).Draw(rt, "word_count")
+		words := make([]string, wordCount)
+
+		for i := range words {
+			words[i] = rapid.StringMatching(`[a-zA-Z0-9]{2,12}`).Draw(rt, "word")
+		}
+
+		body := strings.Join(words, " ")
+		content := "# " + heading + "\n\n" + body + "\n"
+
+		// Choose a contiguous sub-slice of words as the excerpt
+		// (at least 2 words).
+		excerptStart := rapid.IntRange(0, wordCount-2).Draw(rt, "excerpt_start")
+		excerptEnd := rapid.IntRange(excerptStart+2, wordCount).Draw(rt, "excerpt_end")
+
+		originalExcerpt := strings.Join(words[excerptStart:excerptEnd], " ")
+
+		// Create a whitespace-varied version of the excerpt by inserting varied
+		// whitespace between the same words.
+		wsOptions := []string{
+			"  ",
+			"   ",
+			"    ",
+			"\t",
+			"\n",
+			" \t ",
+			"\t\t",
+			"  \n  ",
+		}
+
+		var builder strings.Builder
+
+		for i, w := range words[excerptStart:excerptEnd] {
+			if i > 0 {
+				wsIdx := rapid.IntRange(0, len(wsOptions)-1).Draw(rt, "ws_idx")
+				builder.WriteString(wsOptions[wsIdx])
+			}
+
+			builder.WriteString(w)
+		}
+
+		variedExcerpt := builder.String()
+
+		// Write content to a temp file.
+		dir := t.TempDir()
+		testFile := filepath.Join(dir, "test.md")
+
+		writeErr := os.WriteFile(testFile, []byte(content), 0o0666)
+		require.NoError(rt, writeErr)
+
+		// Validate with the original excerpt.
+		originalResult, originalErr := citation.Validate(
+			context.Background(),
+			&citation.ValidateInput{
+				QuotedExcerpt:    originalExcerpt,
+				FilePath:         "test.md",
+				SectionReference: heading,
+				WorkspaceRoot:    dir,
+			},
+		)
+		require.NoError(rt, originalErr)
+
+		// Validate with the whitespace-varied excerpt.
+		variedResult, variedErr := citation.Validate(
+			context.Background(),
+			&citation.ValidateInput{
+				QuotedExcerpt:    variedExcerpt,
+				FilePath:         "test.md",
+				SectionReference: heading,
+				WorkspaceRoot:    dir,
+			},
+		)
+		require.NoError(rt, variedErr)
+
+		// Both must succeed (Valid: true).
+		assert.True(
+			rt,
+			originalResult.Valid,
+			"original excerpt %q should match in section %q",
+			originalExcerpt,
+			heading,
+		)
+		assert.True(
+			rt,
+			variedResult.Valid,
+			"whitespace-varied excerpt %q should match in section %q (original: %q)",
+			variedExcerpt,
+			heading,
+			originalExcerpt,
+		)
+
+		// Both produce the same Valid: true outcome.
+		assert.Equal(
+			rt,
+			originalResult.Valid,
+			variedResult.Valid,
+			"whitespace variation must not change validation outcome",
+		)
 	})
 }

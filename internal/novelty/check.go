@@ -25,9 +25,9 @@ const (
 	// prior finding for the same criterion.
 	ReasonNewEvidence = "new evidence for existing criterion"
 
-	// ReasonNewScoreWithEvidence indicates the finding has a different score
-	// for the same criterion and includes new evidence.
-	ReasonNewScoreWithEvidence = "different score with new evidence"
+	// ReasonNewSatisfactionWithEvidence indicates the finding differs in
+	// satisfaction and includes new evidence.
+	ReasonNewSatisfactionWithEvidence = "different satisfaction with new evidence"
 )
 
 type (
@@ -99,7 +99,7 @@ func buildPriorIndex(findings []models.ReviewFinding) map[string]*priorEntry {
 		}
 
 		entry.excerpts[f.QuotedExcerpt] = struct{}{}
-		entry.scores[f.Score] = struct{}{}
+		entry.scores[f.CriterionSatisfaction] = struct{}{}
 	}
 
 	return index
@@ -112,10 +112,10 @@ func classifyFinding(current *models.ReviewFinding, priorIndex map[string]*prior
 	}
 
 	_, evidenceSeen := entry.excerpts[current.QuotedExcerpt]
-	_, scoreSeen := entry.scores[current.Score]
+	_, scoreSeen := entry.scores[current.CriterionSatisfaction]
 
 	if !evidenceSeen && !scoreSeen {
-		return ReasonNewScoreWithEvidence
+		return ReasonNewSatisfactionWithEvidence
 	}
 
 	if !evidenceSeen {

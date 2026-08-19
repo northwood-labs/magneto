@@ -24,8 +24,8 @@ var installCmd = &cobra.Command{
 	Use:   "install",
 	Short: "Install integration files for supported editors",
 	Long: clihelpers.LongHelpText(`
-		Installs integration files for supported editors.
-		`),
+	Installs integration files for supported editors.
+	`),
 }
 
 func init() { // lint:allow_init

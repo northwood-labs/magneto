@@ -2,11 +2,11 @@
   "version": "v1",
   "hooks": [
     {
-      "name": "Adversarial Review Trigger",
+      "name": "Magneto: Adversarial Review Trigger",
       "trigger": "PostTaskExec",
       "action": {
         "type": "agent",
-        "prompt": "A design task has completed. Check if the design artifact has changed. If it has, and it touches a blast-radius domain (auth, secrets, payments, data-integrity, irreversible-actions), run the adversarial review agent against the updated design document using the citation-gate MCP server to validate findings."
+        "prompt": "A design task has completed. Before classification, compare the post-task SHA-256 digest of the Design_Artifact against the pre-task snapshot retained in memory keyed by task execution ID and canonical artifact path. If the digests are equal, attach a review-skipped annotation with reason unchanged and allow the workflow to continue. If the artifact is changed, classify eligibility using the trigger classifier with deterministic design metadata. If the changed artifact is deterministically ineligible, attach a review-skipped annotation with the classifier reason. If the changed artifact is eligible (foundational or blast-radius domain), ambiguous (classifier cannot decide), has a missing pre-task snapshot, or has a conflicting stored selection reason, start exactly one review session by invoking the adversarial review operational protocol defined in .kiro/steering/adversarial-review-operational-protocol.md. If session start or annotation persistence fails, emit a review-trigger-failed warning annotation, record the failure when persistence is available, and allow the Kiro workflow to continue without blocking."
       }
     }
   ]

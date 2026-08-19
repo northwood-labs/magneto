@@ -199,6 +199,7 @@ func captureInstallKiroStdout(t *testing.T, action func() error) (string, error)
 	require.NoError(t, pipeErr)
 
 	originalStdout := os.Stdout
+
 	os.Stdout = writer
 
 	actionErr := action()
