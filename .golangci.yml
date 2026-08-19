@@ -11,7 +11,7 @@ linters:
 
   # Enable specific linters.
   enable:
-    # @config-manager:start linters-enable
+    # Don't sync with config-manager. Need to remove `embeddedstructfieldcheck` for this repo.
     - arangolint
     - asasalint
     - asciicheck
@@ -22,30 +22,25 @@ linters:
     - containedctx
     - contextcheck
     - copyloopvar
-    # - cyclop
     - decorder
     - depguard
     - dogsled
     - dupl
     - dupword
     - durationcheck
-    - embeddedstructfieldcheck
+    # - embeddedstructfieldcheck
     - err113
     - errcheck
     - errchkjson
     - errname
     - errorlint
     - exhaustive
-    # - exhaustruct
     - exptostd
     - fatcontext
-    # - forbidigo
     - forcetypeassert
     - funcorder
     - funlen
-    # - ginkgolinter
     - gocheckcompilerdirectives
-    # - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
     - gocognit
@@ -56,11 +51,8 @@ linters:
     - godot
     - godox
     - goheader
-    # - gomoddirectives
-    # - gomodguard_v2
     - goprintffuncname
     - gosec
-    # - gosmopolitan
     - govet
     - grouper
     - iface
@@ -70,16 +62,13 @@ linters:
     - interfacebloat
     - intrange
     - iotamixing
-    # - ireturn
     - lll
-    # - loggercheck
     - maintidx
     - makezero
     - mirror
     - misspell
     - mnd
     - modernize
-    # - musttag
     - nakedret
     - nestif
     - nilerr
@@ -87,20 +76,15 @@ linters:
     - nilnil
     - nlreturn
     - noctx
-    # - noinlineerr
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
     - paralleltest
     - perfsprint
-    # - prealloc
-    # - predeclared
-    # - promlinter
     - protogetter
     - reassign
     - recvcheck
     - revive
-    # - rowserrcheck
     - sloglint
     - spancheck
     - sqlclosecheck
@@ -109,24 +93,20 @@ linters:
     - tagliatelle
     - testableexamples
     - testifylint
-    # - testpackage
     - thelper
     - tparallel
     - unconvert
     - unparam
-    # - unqueryvet
     - unused
     - usestdlibvars
     - usetesting
-    # - varnamelen
     - wastedassign
     - whitespace
     - wrapcheck
     - wsl_v5
     - zerologlint
-    # @config-manager:end linters-enable
 
-    # All available settings of specific linters.
+  # All available settings of specific linters.
   settings:
     asasalint:
       # @config-manager:start linters-settings-asasalint
@@ -419,6 +399,10 @@ linters:
 
     embeddedstructfieldcheck:
       # @config-manager:start linters-settings-embeddedstructfieldcheck
+      # Checks that there is an empty space between the embedded fields and regular fields.
+      # Default: true
+      empty-line: true
+
       # Checks that sync.Mutex and sync.RWMutex are not used as embedded fields.
       # Default: false
       forbid-mutex: true

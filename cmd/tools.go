@@ -163,23 +163,23 @@ type (
 	// canonicalCitationResult extends ValidateResult with provenance
 	// correlation fields for canonical review sessions.
 	canonicalCitationResult struct {
-		SessionID               string `json:"session_id"`
-		SchemaProvenanceID      string `json:"schema_provenance_correlation_id"`
-		ProvenanceCorrelationID string `json:"provenance_correlation_id"`
+		SessionID               string `json:"session_id"`                       // lint:allow_format
+		SchemaProvenanceID      string `json:"schema_provenance_correlation_id"` // lint:allow_format
+		ProvenanceCorrelationID string `json:"provenance_correlation_id"`        // lint:allow_format
 		citation.ValidateResult
-		FindingIndex  int  `json:"finding_index"`
-		SchemaValid   bool `json:"schema_valid"`
-		CitationValid bool `json:"citation_valid"`
+		FindingIndex  int  `json:"finding_index"`  // lint:allow_format
+		SchemaValid   bool `json:"schema_valid"`   // lint:allow_format
+		CitationValid bool `json:"citation_valid"` // lint:allow_format
 	}
 
 	// canonicalBatchResult extends BatchResult with provenance correlation
 	// fields for canonical batch validation.
 	canonicalBatchResult struct {
-		SessionID               string `json:"session_id"`
-		SchemaProvenanceID      string `json:"schema_provenance_correlation_id"`
-		ProvenanceCorrelationID string `json:"provenance_correlation_id"`
+		SessionID               string `json:"session_id"`                       // lint:allow_format
+		SchemaProvenanceID      string `json:"schema_provenance_correlation_id"` // lint:allow_format
+		ProvenanceCorrelationID string `json:"provenance_correlation_id"`        // lint:allow_format
 		citation.BatchResult
-		SchemaValid bool `json:"schema_valid"`
+		SchemaValid bool `json:"schema_valid"` // lint:allow_format
 	}
 )
 

@@ -11,7 +11,7 @@
 # 2026/08/14 16:40:23.257606 [TestProperty_MCPMergeOutputFormatting] [rapid] draw missing_configuration: false
 # 2026/08/14 16:40:23.257606 [TestProperty_MCPMergeOutputFormatting] [rapid] draw server_name: "0"
 # 2026/08/14 16:40:23.257635 [TestProperty_MCPMergeOutputFormatting] merged output is not formatted with two-space indentation: "{\n  \"mcpServers\": {\n    \"external00\": {\n      \"command\": \"0\",\n      \"args\": [\n        \"0\"\n      ],\n      \"env\": {\n        \"TOKEN\": \"0\"\n      },\n      \"disabled\": false\n    },\n    \"installed0\": {\n      \"command\": \"magneto\",\n      \"args\": [\n        \"serve\"\n      ],\n      \"env\": {\n        \"WORKSPACE_ROOT\": \"${workspaceFolder}\"\n      },\n      \"disabled\": false\n    }\n  },\n  \"metadata0\": {\n    \"owner\": \"0\",\n    \"tags\": [\n      \"0\"\n    ],\n    \"priority\": 0\n  }\n}\n"
-# 
+#
 v0.4.8#17016403225259092213
 0x0
 0x0

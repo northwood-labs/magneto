@@ -9,7 +9,7 @@
 ```text
 main.go
   └─ cmd.Execute()
-       └─ fang.Execute(rootCmd)  [cobra + terminal color support]
+        └─ fang.Execute(rootCmd)  [cobra + terminal color support]
             ├─ serve   → starts MCP stdio server with 3 tools
             ├─ review  → orchestrates adversarial review pipeline
             └─ version → prints build info
