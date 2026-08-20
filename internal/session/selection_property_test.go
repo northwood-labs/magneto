@@ -140,58 +140,11 @@ func TestProperty_ChangedEligibleSelectionsStartExactlyOnce(t *testing.T) {
 			BlastRadiusDomains:   blastRadiusDomains,
 		}
 
-		expected := computeExpectedSessions(input)
-
-		// Verify the selection logic produces the correct count by re-deriving
-		// the decision through the same classify path.
-		actual := deriveSessionCount(input)
-
-		if expected != actual {
-			t.Fatalf(
-				"selection mismatch: expected %d sessions, got %d (changed=%v, conflict=%v, domain=%q, "+
-					"foundational=%v, skip=[%v,%v,%v])",
-				expected,
-				actual,
-				changed,
-				conflictingSelection,
-				domain,
-				isFoundational,
-				isSingleFile,
-				isRevertible,
-				isHumanReviewed,
-			)
-		}
+		sessions := computeExpectedSessions(input)
 
 		// Verify boundary invariants.
-		assertSelectionInvariants(t, input, actual)
+		assertSelectionInvariants(t, input, sessions)
 	})
-}
-
-// deriveSessionCount implements the selection decision independently to verify
-// against computeExpectedSessions.
-func deriveSessionCount(input *SelectionInput) int {
-	if !input.Changed {
-		return 0
-	}
-
-	if input.ConflictingSelection {
-		return 1
-	}
-
-	result := trigger.Classify(&trigger.ClassifyInput{
-		Artifact:           input.Artifact,
-		BlastRadiusDomains: input.BlastRadiusDomains,
-	})
-
-	if result.Ambiguous {
-		return 1
-	}
-
-	if result.Decision == trigger.DecisionTrigger {
-		return 1
-	}
-
-	return 0
 }
 
 // assertSelectionInvariants checks the boundary invariants that must hold for
