@@ -179,7 +179,6 @@ jobs:
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-minor'}}
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          # GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           gh pr merge --auto --squash "${PR_URL}"
 
@@ -187,7 +186,6 @@ jobs:
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          # GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           gh pr merge --auto --squash "${PR_URL}"
     # @config-manager:end workflow-steps
