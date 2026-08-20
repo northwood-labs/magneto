@@ -172,8 +172,6 @@ jobs:
       - name: Dependabot metadata
         id: metadata
         uses: step-security/dependabot-fetch-metadata@bf8fb6e0be0a711c669dc236de6e7f7374ba626e # v3.1.0
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Auto-merge Dependabot PRs for semver-minor updates
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-minor'}}

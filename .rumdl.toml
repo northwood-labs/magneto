@@ -82,10 +82,10 @@
   style = "sentence-case"
   sentence-case-restart-after = [
     #
-    ".", # Numbers
-    ":", # Colon
     "–", # En-dash
+    ":", # Colon
     "—", # Em-dash
+    ".", # Numbers
     #
   ]
   lowercase-words = [
@@ -349,8 +349,8 @@
 [MD044]
   # @config-manager:start md044
   # proper-names
-  enabled       = true
-  code-blocks   = false
+  enabled = true
+  code-blocks = false
   html-elements = false
   html-comments = true
   # @config-manager:end md044
