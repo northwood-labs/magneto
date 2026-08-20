@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), adheres t
 
 ## Unreleased
 
-### :books: Documentation
+### <!-- 0 -->:rocket: Features
 
-* [`7c452e3`](https://github.com/northwood-labs/magneto/commit/7c452e30e143721b53d5923703ee42d78cb95276): Revise `README.md` for clarity and updated functionality. ([@skyzyx](https://github.com/skyzyx))
+* [`eea303a`](https://github.com/northwood-labs/magneto/commit/eea303aae41f659fd8d3e93f803cdc7d45bf9630): Add provenance correlation, session finalization, and Kiro installer. ([@skyzyx](https://github.com/skyzyx))
 
 <p>Generated on 2026-08-20.</p>
