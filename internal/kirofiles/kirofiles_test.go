@@ -32,6 +32,7 @@ func TestFilesAndContent(t *testing.T) {
 		"settings/mcp.json",
 		"steering/adversarial-review-anti-patterns.md",
 		"steering/adversarial-review-architecture-constraints.md",
+		"steering/adversarial-review-operational-protocol.md",
 		"steering/adversarial-review-rubric.md",
 	}
 

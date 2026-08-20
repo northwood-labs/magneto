@@ -15,121 +15,90 @@
 package schema_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/go-openapi/testify/assert"
+	"github.com/go-openapi/testify/require"
 
 	"go.nwlabs.dev/magneto/internal/models"
 	"go.nwlabs.dev/magneto/internal/schema"
 )
 
-// TestValidateFindingSchema exercises schema validation with table-driven tests
-// covering valid findings and each specific validation failure.
-func TestValidateFindingSchema(t *testing.T) {
-	validFinding := &models.ReviewFinding{
-		CriterionName: "Security Boundaries",
-		Score:         7,
-		QuotedExcerpt: "the system enforces structurally independent review",
-		ArtifactLocation: models.ArtifactLocation{
-			FilePath:         "design.md",
-			SectionReference: "Overview",
-		},
-		Status:    models.StatusHypothesized,
-		Reasoning: "criterion is satisfied with cited evidence",
-	}
+type validationCase struct {
+	name          string
+	mutate        func(*models.ReviewFinding)
+	expectField   string
+	expectMessage string
+	expectScore   int
+	expectErr     bool
+}
 
-	tests := []struct {
-		finding       *models.ReviewFinding
-		name          string
-		expectField   string
-		expectMessage string
-		expectErr     bool
-	}{
+// TestValidateFindingSchema exercises schema normalization and validation for
+// canonical proposed findings.
+func TestValidateFindingSchema(t *testing.T) {
+	tests := []validationCase{
 		{
-			name:      "valid finding passes",
-			finding:   validFinding,
-			expectErr: false,
+			name:        "valid finding passes",
+			expectScore: 7,
+		},
+		{
+			name: "satisfaction below range is clamped",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.CriterionSatisfaction = 0
+			},
+			expectScore: 1,
+		},
+		{
+			name: "satisfaction above range is clamped",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.CriterionSatisfaction = 11
+			},
+			expectScore: 10,
 		},
 		{
 			name: "missing criterion name",
-			finding: &models.ReviewFinding{
-				CriterionName: "",
-				Score:         5,
-				QuotedExcerpt: "some evidence text",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "Architecture",
-				},
-				Status:    models.StatusHypothesized,
-				Reasoning: "reasoning text",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.CriterionName = ""
 			},
 			expectErr:     true,
 			expectField:   "criterion_name",
 			expectMessage: "criterion name is required",
 		},
 		{
-			name: "score zero out of range",
-			finding: &models.ReviewFinding{
-				CriterionName: "Data Integrity",
-				Score:         0,
-				QuotedExcerpt: "some evidence text",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "Architecture",
-				},
-				Status:    models.StatusConfirmed,
-				Reasoning: "reasoning text",
+			name: "invalid severity",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.FindingSeverity = models.FindingSeverity("invalid")
 			},
 			expectErr:     true,
-			expectField:   "score",
-			expectMessage: "score must be between 1 and 10",
+			expectField:   "finding_severity",
+			expectMessage: "finding severity must be critical, high, medium, or low",
 		},
 		{
-			name: "score eleven out of range",
-			finding: &models.ReviewFinding{
-				CriterionName: "Data Integrity",
-				Score:         11,
-				QuotedExcerpt: "some evidence text",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "Architecture",
-				},
-				Status:    models.StatusConfirmed,
-				Reasoning: "reasoning text",
+			name: "missing finding domains",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.FindingDomains = nil
 			},
 			expectErr:     true,
-			expectField:   "score",
-			expectMessage: "score must be between 1 and 10",
+			expectField:   "finding_domains",
+			expectMessage: "at least one finding domain is required",
 		},
 		{
-			name: "score negative out of range",
-			finding: &models.ReviewFinding{
-				CriterionName: "Data Integrity",
-				Score:         -1,
-				QuotedExcerpt: "some evidence text",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "Architecture",
-				},
-				Status:    models.StatusConfirmed,
-				Reasoning: "reasoning text",
+			name: "duplicate finding domain",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.FindingDomains = []models.FindingDomain{
+					models.DomainSecurity,
+					models.DomainSecurity,
+				}
 			},
 			expectErr:     true,
-			expectField:   "score",
-			expectMessage: "score must be between 1 and 10",
+			expectField:   "finding_domains",
+			expectMessage: "finding domain \"security\" is duplicated",
 		},
 		{
 			name: "empty quoted excerpt",
-			finding: &models.ReviewFinding{
-				CriterionName: "Context Isolation",
-				Score:         3,
-				QuotedExcerpt: "",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "Components",
-				},
-				Status:    models.StatusHypothesized,
-				Reasoning: "reasoning text",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.QuotedExcerpt = ""
 			},
 			expectErr:     true,
 			expectField:   "quoted_excerpt",
@@ -137,16 +106,8 @@ func TestValidateFindingSchema(t *testing.T) {
 		},
 		{
 			name: "missing file path",
-			finding: &models.ReviewFinding{
-				CriterionName: "Trigger Heuristic",
-				Score:         5,
-				QuotedExcerpt: "the artifact produces outputs",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "",
-					SectionReference: "Architecture",
-				},
-				Status:    models.StatusHypothesized,
-				Reasoning: "reasoning text",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.ArtifactLocation.FilePath = ""
 			},
 			expectErr:     true,
 			expectField:   "artifact_location.file_path",
@@ -154,48 +115,47 @@ func TestValidateFindingSchema(t *testing.T) {
 		},
 		{
 			name: "missing section reference",
-			finding: &models.ReviewFinding{
-				CriterionName: "Stopping Conditions",
-				Score:         8,
-				QuotedExcerpt: "hard round cap of 5",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "",
-				},
-				Status:    models.StatusConfirmed,
-				Reasoning: "reasoning text",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.ArtifactLocation.SectionReference = ""
 			},
 			expectErr:     true,
 			expectField:   "artifact_location.section_reference",
 			expectMessage: "artifact section reference is required",
 		},
 		{
-			name: "invalid status value",
-			finding: &models.ReviewFinding{
-				CriterionName: "Advisory Only",
-				Score:         6,
-				QuotedExcerpt: "strictly advisory",
-				ArtifactLocation: models.ArtifactLocation{
-					FilePath:         "design.md",
-					SectionReference: "Overview",
-				},
-				Status:    models.FindingStatus("invalid_status"),
-				Reasoning: "reasoning text",
+			name: "confirmed status is not accepted from a proposal",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.Status = models.StatusConfirmed
 			},
 			expectErr:     true,
 			expectField:   "status",
-			expectMessage: "status must be a valid FindingStatus value",
+			expectMessage: "proposed status must be hypothesized",
+		},
+		{
+			name: "request-provided gate result is rejected",
+			mutate: func(finding *models.ReviewFinding) {
+				finding.CitationGateResult = &models.CitationGateResult{}
+			},
+			expectErr:     true,
+			expectField:   "citation_gate_result",
+			expectMessage: "gate assertions are not accepted from requests",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			finding := validFinding()
+			if tt.mutate != nil {
+				tt.mutate(finding)
+			}
+
 			var validationErr *schema.SchemaValidationError
 
-			err := schema.ValidateFindingSchema(tt.finding)
+			err := schema.ValidateFindingSchema(finding)
 
 			if !tt.expectErr {
 				assert.NoError(t, err)
+				assert.Equal(t, tt.expectScore, finding.CriterionSatisfaction)
 
 				return
 			}
@@ -209,8 +169,8 @@ func TestValidateFindingSchema(t *testing.T) {
 
 			found := false
 
-			for _, fe := range validationErr.Errors {
-				if fe.Field == tt.expectField && fe.Message == tt.expectMessage {
+			for _, fieldErr := range validationErr.Errors {
+				if fieldErr.Field == tt.expectField && fieldErr.Message == tt.expectMessage {
 					found = true
 
 					break
@@ -225,5 +185,192 @@ func TestValidateFindingSchema(t *testing.T) {
 				tt.expectMessage,
 			)
 		})
+	}
+}
+
+// TestDecodeAndNormalizeFinding verifies canonical migration and proposal
+// validation at the JSON adapter boundary.
+func TestDecodeAndNormalizeFinding(t *testing.T) {
+	tests := []struct {
+		name          string
+		mutate        func(map[string]any)
+		expectField   string
+		expectMessage string
+		expectScore   int
+		expectErr     bool
+	}{
+		{
+			name: "legacy score decodes when canonical field is absent",
+			mutate: func(payload map[string]any) {
+				delete(payload, "criterion_satisfaction")
+
+				payload["score"] = 5
+			},
+			expectScore: 5,
+		},
+		{
+			name: "canonical satisfaction takes precedence over legacy score",
+			mutate: func(payload map[string]any) {
+				payload["criterion_satisfaction"] = 6
+				payload["score"] = 2
+			},
+			expectScore: 6,
+		},
+		{
+			name: "satisfaction below lower bound is clamped",
+			mutate: func(payload map[string]any) {
+				payload["criterion_satisfaction"] = 0
+			},
+			expectScore: 1,
+		},
+		{
+			name: "satisfaction above upper bound is clamped",
+			mutate: func(payload map[string]any) {
+				payload["criterion_satisfaction"] = 11
+			},
+			expectScore: 10,
+		},
+		{
+			name: "missing satisfaction is rejected without a legacy score",
+			mutate: func(payload map[string]any) {
+				delete(payload, "criterion_satisfaction")
+			},
+			expectErr:     true,
+			expectField:   "criterion_satisfaction",
+			expectMessage: "criterion satisfaction is required",
+		},
+		{
+			name: "invalid severity is rejected",
+			mutate: func(payload map[string]any) {
+				payload["finding_severity"] = "urgent"
+			},
+			expectErr:     true,
+			expectField:   "finding_severity",
+			expectMessage: "finding severity must be critical, high, medium, or low",
+		},
+		{
+			name: "invalid domain is rejected",
+			mutate: func(payload map[string]any) {
+				payload["finding_domains"] = []string{"unsupported"}
+			},
+			expectErr:     true,
+			expectField:   "finding_domains",
+			expectMessage: "finding domain \"unsupported\" is not valid",
+		},
+		{
+			name: "empty domain set is rejected",
+			mutate: func(payload map[string]any) {
+				payload["finding_domains"] = nil
+			},
+			expectErr:     true,
+			expectField:   "finding_domains",
+			expectMessage: "at least one finding domain is required",
+		},
+		{
+			name: "duplicate domains are rejected",
+			mutate: func(payload map[string]any) {
+				payload["finding_domains"] = []string{"security", "security"}
+			},
+			expectErr:     true,
+			expectField:   "finding_domains",
+			expectMessage: "finding domain \"security\" is duplicated",
+		},
+		{
+			name: "confirmed status is rejected from a proposal",
+			mutate: func(payload map[string]any) {
+				payload["status"] = models.StatusConfirmed
+			},
+			expectErr:     true,
+			expectField:   "status",
+			expectMessage: "proposed status must be hypothesized",
+		},
+		{
+			name: "unconfirmed status is rejected from a proposal",
+			mutate: func(payload map[string]any) {
+				payload["status"] = models.StatusUnconfirmed
+			},
+			expectErr:     true,
+			expectField:   "status",
+			expectMessage: "proposed status must be hypothesized",
+		},
+		{
+			name: "gate unavailable status is rejected from a proposal",
+			mutate: func(payload map[string]any) {
+				payload["status"] = models.StatusUncheckedGateUnavail
+			},
+			expectErr:     true,
+			expectField:   "status",
+			expectMessage: "proposed status must be hypothesized",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			payload := validFindingPayload()
+			tt.mutate(payload)
+
+			data, marshalErr := json.Marshal(payload)
+			require.NoError(t, marshalErr)
+
+			finding, err := schema.DecodeAndNormalizeFinding(data)
+
+			if !tt.expectErr {
+				require.NoError(t, err)
+				assert.Equal(t, tt.expectScore, finding.CriterionSatisfaction)
+
+				return
+			}
+
+			assertFieldError(t, err, tt.expectField, tt.expectMessage)
+		})
+	}
+}
+
+func assertFieldError(t *testing.T, err error, field, message string) {
+	t.Helper()
+
+	var validationErr *schema.SchemaValidationError
+
+	require.Error(t, err)
+	require.ErrorAs(t, err, &validationErr)
+
+	for _, fieldErr := range validationErr.Errors {
+		if fieldErr.Field == field && fieldErr.Message == message {
+			return
+		}
+	}
+
+	assert.Failf(t, "expected schema field error", "field=%q message=%q", field, message)
+}
+
+func validFindingPayload() map[string]any {
+	return map[string]any{
+		"artifact_location": map[string]string{
+			"file_path":         "design.md",
+			"section_reference": "Overview",
+		},
+		"criterion_name":         "Security Boundaries",
+		"criterion_satisfaction": 7,
+		"finding_domains":        []string{"security"},
+		"finding_severity":       "high",
+		"quoted_excerpt":         "the system enforces structurally independent review",
+		"reasoning":              "criterion is satisfied with cited evidence",
+		"status":                 "hypothesized",
+	}
+}
+
+func validFinding() *models.ReviewFinding {
+	return &models.ReviewFinding{
+		CriterionName:         "Security Boundaries",
+		CriterionSatisfaction: 7,
+		QuotedExcerpt:         "the system enforces structurally independent review",
+		ArtifactLocation: models.ArtifactLocation{
+			FilePath:         "design.md",
+			SectionReference: "Overview",
+		},
+		Status:          models.StatusHypothesized,
+		Reasoning:       "criterion is satisfied with cited evidence",
+		FindingSeverity: models.SeverityHigh,
+		FindingDomains:  []models.FindingDomain{models.DomainSecurity},
 	}
 }

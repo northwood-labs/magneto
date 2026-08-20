@@ -20,23 +20,33 @@ import (
 )
 
 // ConfirmerInput contains the parameters for building the Confirmer subagent's
-// context.
+// context. It includes only claim-local evidence and excludes Reviewer
+// reasoning, intermediate outputs, author context, and mutable capabilities.
 type ConfirmerInput struct {
 	CriterionName    string
 	ClaimText        string
 	ArtifactPath     string
 	SectionReference string
 	QuotedExcerpt    string
+	FindingSeverity  string
+	FindingDomains   []string
+	AllowedPaths     []string
+	AttemptNumber    int
 }
 
 // BuildConfirmerContext constructs the context for the Confirmer subagent. This
-// provides ONLY the specific claim to verify, the artifact location, and the
-// quoted evidence. No broader session context is included.
+// provides ONLY the specific claim to verify, the artifact location, quoted
+// evidence, severity, domains, attempt number, and allowed repository paths. No
+// Reviewer reasoning, intermediate outputs, author context, or broader session
+// context is included.
 func BuildConfirmerContext(input *ConfirmerInput) string {
 	var b strings.Builder
 
 	fmt.Fprint(&b, "## Claim to Verify\n\n")
-	fmt.Fprintf(&b, "Criterion: %s\n\n", input.CriterionName)
+	fmt.Fprintf(&b, "Criterion: %s\n", input.CriterionName)
+	fmt.Fprintf(&b, "Severity: %s\n", input.FindingSeverity)
+	fmt.Fprintf(&b, "Domains: %s\n", strings.Join(input.FindingDomains, ", "))
+	fmt.Fprintf(&b, "Attempt: %d of 3\n\n", input.AttemptNumber)
 	fmt.Fprintf(&b, "%s\n\n", input.ClaimText)
 
 	fmt.Fprint(&b, "## Artifact Location\n\n")
@@ -45,7 +55,17 @@ func BuildConfirmerContext(input *ConfirmerInput) string {
 
 	if input.QuotedExcerpt != "" {
 		fmt.Fprint(&b, "## Quoted Evidence\n\n")
-		fmt.Fprintf(&b, "> %s\n", input.QuotedExcerpt)
+		fmt.Fprintf(&b, "> %s\n\n", input.QuotedExcerpt)
+	}
+
+	if len(input.AllowedPaths) > 0 {
+		fmt.Fprint(&b, "## Allowed Repository Paths\n\n")
+
+		for _, p := range input.AllowedPaths {
+			fmt.Fprintf(&b, "- %s\n", p)
+		}
+
+		fmt.Fprint(&b, "\n")
 	}
 
 	return b.String()

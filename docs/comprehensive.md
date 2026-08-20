@@ -46,7 +46,7 @@ serveCmd.RunE
   │    ├─ AddTool(validateFindingsBatchTool, handleValidateFindingsBatch)
   │    └─ AddTool(validateFindingSchemaTool, handleValidateFindingSchema)
   └─ runStdioServer(ctx)
-       └─ server.NewStdioServer(s).Listen(ctx, os.Stdin, os.Stdout)
+        └─ server.NewStdioServer(s).Listen(ctx, os.Stdin, os.Stdout)
 ```
 
 The server blocks on stdio until the context is cancelled or the transport closes.

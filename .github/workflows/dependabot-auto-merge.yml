@@ -33,15 +33,16 @@ jobs:
     # @config-manager:end workflow-configs
     permissions:
       # @config-manager:start workflow-permissions-job
+      code-quality: write
       contents: write
-      issues: write
       pull-requests: write
       repository-projects: write
+      vulnerability-alerts: read
       # @config-manager:end workflow-permissions-job
     steps:
       # @config-manager:start harden-runner
       - name: Harden Runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         # @config-manager:end harden-runner
         # @config-manager:start step-security-hosts
         with:
@@ -87,6 +88,7 @@ jobs:
             54.203.187.250:443
             54.213.222.183:443
             api.cloudflare.com:443
+            api.datadoghq.com:443
             api.deps.dev:443
             api.github.com:443
             api.gumroad.com:443
@@ -172,14 +174,11 @@ jobs:
       - name: Dependabot metadata
         id: metadata
         uses: step-security/dependabot-fetch-metadata@bf8fb6e0be0a711c669dc236de6e7f7374ba626e # v3.1.0
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Auto-merge Dependabot PRs for semver-minor updates
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-minor'}}
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           gh pr merge --auto --squash "${PR_URL}"
 
@@ -187,7 +186,6 @@ jobs:
         if: ${{steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         run: |
           gh pr merge --auto --squash "${PR_URL}"
     # @config-manager:end workflow-steps

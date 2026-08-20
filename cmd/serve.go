@@ -64,6 +64,7 @@ func newMCPServer() *server.MCPServer {
 	s.AddTool(validateCitationTool, handleValidateCitation)
 	s.AddTool(validateFindingsBatchTool, handleValidateFindingsBatch)
 	s.AddTool(validateFindingSchemaTool, handleValidateFindingSchema)
+	s.AddTool(finalizeReviewSessionTool, handleFinalizeReviewSession)
 
 	return s
 }

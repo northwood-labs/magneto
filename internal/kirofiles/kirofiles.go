@@ -27,6 +27,7 @@ const (
 	mcpTemplateFile  = "settings/mcp.json"
 	antiPatternsFile = "steering/adversarial-review-anti-patterns.md"
 	architectureFile = "steering/adversarial-review-architecture-constraints.md"
+	operationalFile  = "steering/adversarial-review-operational-protocol.md"
 	rubricFile       = "steering/adversarial-review-rubric.md"
 )
 
@@ -34,13 +35,14 @@ const (
 //go:embed source/settings/mcp.json
 //go:embed source/steering/adversarial-review-anti-patterns.md
 //go:embed source/steering/adversarial-review-architecture-constraints.md
+//go:embed source/steering/adversarial-review-operational-protocol.md
 //go:embed source/steering/adversarial-review-rubric.md
 var content embed.FS
 
 // Content returns the embedded bytes for a file in the fixed Kiro manifest.
 func Content(path string) ([]byte, error) {
 	switch path {
-	case hookTriggerFile, mcpTemplateFile, antiPatternsFile, architectureFile, rubricFile:
+	case hookTriggerFile, mcpTemplateFile, antiPatternsFile, architectureFile, operationalFile, rubricFile:
 		data, readErr := content.ReadFile(sourcePrefix + path)
 		if readErr != nil {
 			return nil, fmt.Errorf("%w: %s", readErr, path)
@@ -59,6 +61,7 @@ func Files() []string {
 		mcpTemplateFile,
 		antiPatternsFile,
 		architectureFile,
+		operationalFile,
 		rubricFile,
 	}
 }

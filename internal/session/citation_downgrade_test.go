@@ -34,9 +34,9 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 			input: &session.DowngradeInput{
 				Findings: []models.ReviewFinding{
 					{
-						CriterionName: "error-handling",
-						Score:         4,
-						QuotedExcerpt: "",
+						CriterionName:         "error-handling",
+						CriterionSatisfaction: 4,
+						QuotedExcerpt:         "",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "design.md",
 							SectionReference: "Architecture",
@@ -56,9 +56,9 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 			input: &session.DowngradeInput{
 				Findings: []models.ReviewFinding{
 					{
-						CriterionName: "security-check",
-						Score:         3,
-						QuotedExcerpt: "the system enforces isolation",
+						CriterionName:         "security-check",
+						CriterionSatisfaction: 3,
+						QuotedExcerpt:         "the system enforces isolation",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "",
 							SectionReference: "Overview",
@@ -78,9 +78,9 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 			input: &session.DowngradeInput{
 				Findings: []models.ReviewFinding{
 					{
-						CriterionName: "completeness",
-						Score:         5,
-						QuotedExcerpt: "all criteria must be tested",
+						CriterionName:         "completeness",
+						CriterionSatisfaction: 5,
+						QuotedExcerpt:         "all criteria must be tested",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "requirements.md",
 							SectionReference: "",
@@ -100,9 +100,9 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 			input: &session.DowngradeInput{
 				Findings: []models.ReviewFinding{
 					{
-						CriterionName: "correctness",
-						Score:         6,
-						QuotedExcerpt: "cited text here",
+						CriterionName:         "correctness",
+						CriterionSatisfaction: 6,
+						QuotedExcerpt:         "cited text here",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "design.md",
 							SectionReference: "Components",
@@ -124,13 +124,41 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 			},
 		},
 		{
-			name: "valid citation preserves original status",
+			name: "unavailable gate marks finding unchecked",
 			input: &session.DowngradeInput{
 				Findings: []models.ReviewFinding{
 					{
-						CriterionName: "isolation",
-						Score:         8,
-						QuotedExcerpt: "fresh context window",
+						CriterionName:         "citation-availability",
+						CriterionSatisfaction: 7,
+						QuotedExcerpt:         "the gate checks citations",
+						ArtifactLocation: models.ArtifactLocation{
+							FilePath:         "design.md",
+							SectionReference: "Validation",
+						},
+						Status:    models.StatusHypothesized,
+						Reasoning: "the deterministic gate was unavailable",
+					},
+				},
+				ValidationResults: []session.CitationValidationResult{
+					{
+						FindingIndex:     0,
+						GateAvailability: session.GateUnavailable,
+						FailureReason:    "citation gate transport failed",
+					},
+				},
+			},
+			expectedStatus: []models.FindingStatus{
+				models.StatusUncheckedGateUnavail,
+			},
+		},
+		{
+			name: "valid citation remains hypothesized until confirmation",
+			input: &session.DowngradeInput{
+				Findings: []models.ReviewFinding{
+					{
+						CriterionName:         "isolation",
+						CriterionSatisfaction: 8,
+						QuotedExcerpt:         "fresh context window",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "design.md",
 							SectionReference: "Overview",
@@ -141,13 +169,15 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 				},
 				ValidationResults: []session.CitationValidationResult{
 					{
-						FindingIndex:  0,
-						CitationValid: true,
+						FindingIndex:            0,
+						SchemaValid:             true,
+						CitationValid:           true,
+						ProvenanceCorrelationID: "gate-result-1",
 					},
 				},
 			},
 			expectedStatus: []models.FindingStatus{
-				models.StatusConfirmed,
+				models.StatusHypothesized,
 			},
 		},
 		{
@@ -155,9 +185,9 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 			input: &session.DowngradeInput{
 				Findings: []models.ReviewFinding{
 					{
-						CriterionName: "blast-radius",
-						Score:         2,
-						QuotedExcerpt: "",
+						CriterionName:         "blast-radius",
+						CriterionSatisfaction: 2,
+						QuotedExcerpt:         "",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "design.md",
 							SectionReference: "Trigger",
@@ -177,10 +207,7 @@ func TestDowngradeUncitedFindings(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Capture original statuses for mutation check.
-			originalStatuses := make(
-				[]models.FindingStatus,
-				len(tt.input.Findings),
-			)
+			originalStatuses := make([]models.FindingStatus, len(tt.input.Findings))
 			for i, f := range tt.input.Findings {
 				originalStatuses[i] = f.Status
 			}

@@ -30,16 +30,25 @@ import (
 	"go.nwlabs.dev/magneto/internal/trigger"
 )
 
+// deprecationNotice is the message emitted when `magneto review` is invoked
+// directly. The command remains a compatibility wrapper that neither invokes
+// subagents nor claims to run the operational workflow.
+const deprecationNotice = "NOTICE: magneto review is deprecated for " +
+	"interactive use. Use the Kiro-native MCP finalization workflow " +
+	"(finalize_review_session) for operational review orchestration."
+
 var (
 	fSpecName string
 	fDomain   string
 
 	reviewCmd = &cobra.Command{
 		Use:   "review [artifact-path]",
-		Short: "Run adversarial review on a design artifact",
+		Short: "Run adversarial review on a design artifact (deprecated)",
 		Long: clihelpers.LongHelpText(`
-		Orchestrates the adversarial review pipeline: trigger classification,
-		review rounds, citation validation, and output generation.
+		Non-interactive compatibility wrapper that classifies a design artifact,
+		writes a terminal review record, and emits a deprecation notice. It does
+		not invoke subagents or run the operational workflow. Use the Kiro-native
+		MCP finalization workflow (finalize_review_session) instead.
 		`),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -55,9 +64,10 @@ func init() { // lint:allow_init
 	reviewCmd.Flags().StringVar(&fDomain, "domain", "", "Blast-radius domain of the artifact")
 }
 
-// runReview orchestrates the full adversarial review pipeline for the given
-// artifact. It classifies the artifact against trigger heuristics, initializes
-// session state, coordinates the review framework, and writes the final output.
+// runReview is a non-interactive compatibility wrapper. It classifies the
+// artifact against trigger heuristics, writes a terminal record using canonical
+// satisfaction fields, emits a deprecation notice, and returns. It never
+// invokes subagents or claims to run the full Kiro-native operational workflow.
 func runReview(ctx context.Context, artifactPath string) error {
 	_ = ctx
 
@@ -71,6 +81,7 @@ func runReview(ctx context.Context, artifactPath string) error {
 		var b strings.Builder
 
 		fmt.Fprintf(&b, "Skipping review: %s\n", classifyResult.Reason)
+		fmt.Fprintf(&b, "%s\n", deprecationNotice)
 		fmt.Fprint(os.Stdout, b.String())
 
 		return nil
@@ -87,9 +98,9 @@ func runReview(ctx context.Context, artifactPath string) error {
 		},
 	}
 
-	// The actual review loop is driven by the agent system calling MCP tools
-	// (validate_citation, etc.). This command sets up the framework and
-	// finalizes output after rounds complete.
+	// This compatibility wrapper does not invoke subagents or drive a review
+	// loop. It records terminal state from the existing session primitives and
+	// writes one record.
 	sessionOutput.Metadata.TerminalStatus = dt.AllowedTerminalStatus(models.TerminalNotApproved)
 	sessionOutput.Metadata.RoundsExecuted = rm.RoundsExecuted()
 	sessionOutput.Metadata.DegradedComponents = dt.Entries()
@@ -118,6 +129,7 @@ func runReview(ctx context.Context, artifactPath string) error {
 
 	var out strings.Builder
 
+	fmt.Fprintf(&out, "%s\n", deprecationNotice)
 	fmt.Fprintf(&out, "Review written to %s\n", filename)
 	fmt.Fprint(os.Stdout, out.String())
 

@@ -79,7 +79,7 @@ tasks:
         msg: "hk must be installed to manage hooks. Run 'task install:tools` first."
     cmds:
       - task: internal:header
-        vars: {TEXT: "Installing Git hooks..."}
+        vars: { TEXT: "Installing Git hooks..." }
       - hk install
 
   install:tools:
@@ -91,7 +91,7 @@ tasks:
       in arbitrary order.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Installing dependencies from Brewfiles..."}
+        vars: { TEXT: "Installing dependencies from Brewfiles..." }
       - >
         gfind ./tools -type f -name "Brewfile.*"
         | gxargs -I% brew bundle --upgrade --upgrade-formulae --install --jobs=auto --file="%"
@@ -109,7 +109,7 @@ tasks:
       merge tool.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Configuring project Git configuration..."}
+        vars: { TEXT: "Configuring project Git configuration..." }
       - git config blame.ignoreRevsFile .git-blame-ignore-revs
   # @config-manager:end gitconfig-standard
 
@@ -129,7 +129,7 @@ tasks:
       Goal is for this to complete in under 5 seconds.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Linting changed files..."}
+        vars: { TEXT: "Linting changed files..." }
       - hk fix --no-fail-fast
 
   lint:full:
@@ -142,7 +142,7 @@ tasks:
       linting everything.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Linting changed files..."}
+        vars: { TEXT: "Linting changed files..." }
       - hk fix --no-fail-fast --profile slow
 
   lint:deep:
@@ -154,7 +154,7 @@ tasks:
       the repository. This is slower, but more comprehensive.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Linting ALL files..."}
+        vars: { TEXT: "Linting ALL files..." }
       - hk fix --all --no-fail-fast
 
   lint:deep:full:
@@ -166,7 +166,7 @@ tasks:
       the repository. This is slower, but more comprehensive.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Linting ALL files with ALL (including slow) tools..."}
+        vars: { TEXT: "Linting ALL files with ALL (including slow) tools..." }
       - hk fix --all --no-fail-fast --profile slow
 
   lint:list:
@@ -222,7 +222,7 @@ tasks:
       STEP: "{{ index .MATCH 0 }}"
     cmds:
       - task: internal:header
-        vars: {TEXT: "Linting ALL files with {{ .STEP }}..."}
+        vars: { TEXT: "Linting ALL files with {{ .STEP }}..." }
       - hk fix --all --no-fail-fast --step {{ .STEP }} --profile slow
 
   lint:*:
@@ -233,7 +233,7 @@ tasks:
       STEP: "{{ index .MATCH 0 }}"
     cmds:
       - task: internal:header
-        vars: {TEXT: "Linting changed files with {{ .STEP }}..."}
+        vars: { TEXT: "Linting changed files with {{ .STEP }}..." }
       - hk fix --no-fail-fast --step {{ .STEP }} --profile slow
 
   # @config-manager:end linting-standard
@@ -275,7 +275,7 @@ tasks:
       Gets list of software licenses in-use.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Detecting software licenses..."}
+        vars: { TEXT: "Detecting software licenses..." }
       - trivy fs --config trivy-license.yaml --format json . 2>/dev/null > .licenses.cache.json
       - silent: true
         cmd: |
@@ -327,7 +327,7 @@ tasks:
       These are user-specific and do not belong in any Git repo.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Cleaning .DS_Store files..."}
+        vars: { TEXT: "Cleaning .DS_Store files..." }
       - '{{ .FIND }} . -type f -name ".DS_Store" | {{ .XARGS }} -I% {{ .RM }} -fv "%"'
 
   clean:lychee:
@@ -338,6 +338,6 @@ tasks:
       Cleans the Lychee report and cache files from disk.
     cmds:
       - task: internal:header
-        vars: {TEXT: "Cleaning Lychee artifacts..."}
+        vars: { TEXT: "Cleaning Lychee artifacts..." }
       - "{{ .RM }} -vf .lychee* lychee.md"
   # @config-manager:end cleaning-standard

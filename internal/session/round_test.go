@@ -31,9 +31,9 @@ func uniqueFindings(r, n int) []models.ReviewFinding {
 
 	for i := range n {
 		findings = append(findings, models.ReviewFinding{
-			CriterionName: fmt.Sprintf("criterion-r%d-%d", r, i),
-			Score:         5,
-			QuotedExcerpt: fmt.Sprintf("evidence for round %d finding %d", r, i),
+			CriterionName:         fmt.Sprintf("criterion-r%d-%d", r, i),
+			CriterionSatisfaction: 5,
+			QuotedExcerpt:         fmt.Sprintf("evidence for round %d finding %d", r, i),
 			ArtifactLocation: models.ArtifactLocation{
 				FilePath:         "design.md",
 				SectionReference: "Overview",
@@ -53,14 +53,19 @@ func passingFindings(r, n int) []models.ReviewFinding {
 
 	for i := range n {
 		findings = append(findings, models.ReviewFinding{
-			CriterionName: fmt.Sprintf("passing-r%d-%d", r, i),
-			Score:         8,
-			QuotedExcerpt: fmt.Sprintf("passing evidence for round %d finding %d", r, i),
+			CriterionName:         fmt.Sprintf("passing-r%d-%d", r, i),
+			CriterionSatisfaction: 8,
+			QuotedExcerpt:         fmt.Sprintf("passing evidence for round %d finding %d", r, i),
 			ArtifactLocation: models.ArtifactLocation{
 				FilePath:         "design.md",
 				SectionReference: "Architecture",
 			},
-			Status:    models.StatusConfirmed,
+			CitationGateResult: &models.CitationGateResult{
+				SchemaValid:             true,
+				CitationValid:           true,
+				ProvenanceCorrelationID: "test-gate-result",
+			},
+			Status:    models.StatusHypothesized,
 			Reasoning: "satisfies criterion",
 		})
 	}
@@ -128,9 +133,9 @@ func TestRoundManager(t *testing.T) {
 				// Attack round surfaces new issues.
 				attackFindings := []models.ReviewFinding{
 					{
-						CriterionName: "attack-issue-1",
-						Score:         4,
-						QuotedExcerpt: "attack evidence alpha",
+						CriterionName:         "attack-issue-1",
+						CriterionSatisfaction: 4,
+						QuotedExcerpt:         "attack evidence alpha",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "design.md",
 							SectionReference: "Security",
@@ -163,6 +168,28 @@ func TestRoundManager(t *testing.T) {
 
 				assert.Equal(t, session.StateApproved, state)
 				assert.Equal(t, session.StateApproved, rm.State())
+				assert.Equal(t, session.ReasonApproved, rm.StopReason())
+			},
+		},
+		{
+			name: "novel attack finding at round cap is not approved",
+			run: func(t *testing.T) {
+				t.Helper()
+
+				rm := session.NewRoundManager()
+
+				for round := range session.MaxRounds - 1 {
+					rm.SubmitFindings(uniqueFindings(round, 1))
+					assert.Equal(t, session.StateActive, rm.AdvanceRound())
+				}
+
+				rm.SubmitFindings(passingFindings(session.MaxRounds, 1))
+				assert.Equal(t, session.StateAttackRound, rm.AdvanceRound())
+
+				state := rm.SubmitAttackRound(uniqueFindings(session.MaxRounds+1, 1))
+
+				assert.Equal(t, session.StateCapReached, state)
+				assert.Equal(t, session.ReasonRoundCap, rm.StopReason())
 			},
 		},
 		{
@@ -175,9 +202,9 @@ func TestRoundManager(t *testing.T) {
 				// Round 1: submit findings.
 				duplicatedFindings := []models.ReviewFinding{
 					{
-						CriterionName: "duplicate-criterion",
-						Score:         4,
-						QuotedExcerpt: "same evidence each time",
+						CriterionName:         "duplicate-criterion",
+						CriterionSatisfaction: 4,
+						QuotedExcerpt:         "same evidence each time",
 						ArtifactLocation: models.ArtifactLocation{
 							FilePath:         "design.md",
 							SectionReference: "Overview",

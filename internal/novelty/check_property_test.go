@@ -39,9 +39,9 @@ func TestProperty_NoveltySubsetDetection(t *testing.T) {
 
 		for i := range count {
 			priorFindings[i] = models.ReviewFinding{
-				CriterionName: rapid.StringMatching(`[a-z]{3,15}-[a-z]{3,15}`).Draw(t, "criterion"),
-				Score:         rapid.IntRange(1, 10).Draw(t, "score"),
-				QuotedExcerpt: rapid.StringMatching(`[a-zA-Z0-9 ]{10,80}`).Draw(t, "excerpt"),
+				CriterionName:         rapid.StringMatching(`[a-z]{3,15}-[a-z]{3,15}`).Draw(t, "criterion"),
+				CriterionSatisfaction: rapid.IntRange(1, 10).Draw(t, "score"),
+				QuotedExcerpt:         rapid.StringMatching(`[a-zA-Z0-9 ]{10,80}`).Draw(t, "excerpt"),
 				ArtifactLocation: models.ArtifactLocation{
 					FilePath:         rapid.StringMatching(`[a-z/]{5,20}\.md`).Draw(t, "path"),
 					SectionReference: rapid.StringMatching(`[A-Z][a-z]{3,12}`).Draw(t, "section"),

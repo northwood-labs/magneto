@@ -1,0 +1,634 @@
+{
+  "pbtResults": {
+    "8.1 Add Property 1 in new `internal/session/selection_property_test.go`: changed eligible, ambiguous, and conflicting selections start exactly one session; unchanged and ineligible selections start none.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787000611559
+    },
+    "8.2 Add Property 2 in `internal/session/routing_property_test.go`: author-distinct Confirmer selection and clamped criterion satisfaction preserve the evidence-availability rules.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787000823330
+    },
+    "8.3 Add Property 3 in `internal/schema/validate_property_test.go`: normalization preserves independent valid satisfaction, severity, and domains.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787001121873
+    },
+    "8.4 Add Property 4 in `internal/session/routing_property_test.go`: Confirmer targets exactly match the gate-valid high-impact predicate.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787001289154
+    },
+    "8.5 Add Property 5 in `internal/session/routing_property_test.go`: gate and Confirmer transitions cannot produce unsupported confirmation.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787001455635
+    },
+    "8.6 Add Property 6 in `internal/citation/validate_property_test.go`: whitespace-only variation preserves deterministic successful citation matching.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787001613205
+    },
+    "8.7 Add Property 7 in `internal/session/round_property_test.go`: the review state remains bounded and requires an attack round before approval.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787001902919
+    },
+    "8.8 Add Property 8 in new `internal/output/markdown_property_test.go`: terminal finalization preserves available findings and human decisions, renders unavailable values only for partial records, and rejects empty rationales.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787002262680
+    },
+    "8.9 Add Property 9 in `internal/session/degradation_property_test.go`: required degradation prevents approval, optional degradation preserves evaluation, and a valid override preserves degradations.": {
+      "status": "passed",
+      "lastRunTimestamp": 1787002396326
+    }
+  },
+  "executionHistory": {
+    "1.1 Replace the canonical `Score` concept with `CriterionSatisfaction`, add severity, domains, citation-gate provenance, confirmer attempts, component criticality, unavailable values, and selection metadata in `internal/models/finding.go` and `internal/models/session.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994360535
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994367309
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994585223
+      }
+    ],
+    "1.2 Extend `internal/schema/validate.go` to normalize canonical findings before storage: map legacy `score` only when `criterion_satisfaction` is absent, clamp satisfaction to 1 through 10, validate enum values and distinct non-empty domains, and reject non-hypothesized proposed statuses.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994360619
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994591928
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994817693
+      }
+    ],
+    "1.3 Add focused migration and schema unit tests in `internal/schema/validate_test.go` and `internal/schema/validate_property_test.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994360719
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994822326
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994933335
+      }
+    ],
+    "2.1 Add pure selection, confirmation-target, apparent-approval, and finding-status transition functions in `internal/session/routing.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994360788
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994937389
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995035516
+      }
+    ],
+    "2.2 Update `internal/session/round.go`, `internal/session/citation_downgrade.go`, and `internal/session/degradation.go` for the approved workflow semantics.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994360867
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995041780
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995212853
+      }
+    ],
+    "2.3 Add terminal-session finalization validation in `internal/session/finalize.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994360939
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995217778
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995494057
+      }
+    ],
+    "2.4 Add session unit tests in `internal/session/round_test.go`, `internal/session/citation_downgrade_test.go`, `internal/session/degradation_test.go`, and new `internal/session/routing_test.go` and `internal/session/finalize_test.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361019
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995498845
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995716992
+      }
+    ],
+    "3.1 Update `cmd/serve.go`, `cmd/tools.go`, and `cmd/errors.go` to add `finalize_review_session` and extend the three existing validation tools through additive canonical-field adapters.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361085
+      },
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995723253
+      }
+    ],
+    "3.2 After Task 4.1 establishes canonical terminal-record rendering, wire `finalize_review_session` through `internal/session/finalize.go`, `internal/output/filename.go`, and `internal/output/markdown.go` so each terminal idempotency key persists at most one record and returns the original path on retry.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361150
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996085897
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996312925
+      }
+    ],
+    "3.3 Add real MCP handler integration tests in `cmd/serve_test.go` and `cmd/tools_test.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361208
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996318153
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996552373
+      }
+    ],
+    "4.1 Update `internal/output/markdown.go` and `internal/output/filename.go` to render canonical satisfaction, severity, domains, deterministic gate outcomes, confirmation attempts or evidence, selection metadata, attack result, degradation details, and the absent Phase 3 baseline marker.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361273
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996557974
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996784280
+      }
+    ],
+    "4.2 Extend `internal/output/output_test.go` with terminal-only output examples.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361367
+      },
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996791427
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787005651473
+      }
+    ],
+    "5.1 Update `cmd/review.go` and `cmd/review_test.go` so `magneto review` remains non-interactive, emits the approved Kiro-native finalization deprecation notice, and never invokes subagents or claims to run the operational workflow.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361431
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786997796798
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998254197
+      }
+    ],
+    "5.2 Add compatibility tests in `cmd/review_test.go` and `internal/output/output_test.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361490
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998262920
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998529047
+      }
+    ],
+    "6.1 Update `internal/prompt/reviewer.go`, `internal/prompt/confirmer.go`, and `internal/prompt/attack.go` to use only the approved role-local inputs.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361557
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998537629
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998716062
+      }
+    ],
+    "6.2 Create `internal/prompt/reviewer_test.go`, `internal/prompt/confirmer_test.go`, and `internal/prompt/attack_test.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361636
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998891036
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786999015177
+      }
+    ],
+    "7.1 After Task 6.1 establishes the isolated role-local prompts, update `.kiro/hooks/adversarial-review-trigger.json` and add `.kiro/steering/adversarial-review-operational-protocol.md` with the coordinator protocol defined by the approved design.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361699
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786999023982
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000211709
+      }
+    ],
+    "7.2 Add hook and coordinator configuration tests in `.kiro/hooks/adversarial-review-trigger_test.go` and `.kiro/steering/adversarial-review-operational-protocol_test.go`.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361757
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000221536
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000394514
+      }
+    ],
+    "8.1 Add Property 1 in new `internal/session/selection_property_test.go`: changed eligible, ambiguous, and conflicting selections start exactly one session; unchanged and ineligible selections start none.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361825
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000409534
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000627419
+      }
+    ],
+    "8.2 Add Property 2 in `internal/session/routing_property_test.go`: author-distinct Confirmer selection and clamped criterion satisfaction preserve the evidence-availability rules.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361918
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000636706
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000838221
+      }
+    ],
+    "8.3 Add Property 3 in `internal/schema/validate_property_test.go`: normalization preserves independent valid satisfaction, severity, and domains.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994361986
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000847383
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001136252
+      }
+    ],
+    "8.4 Add Property 4 in `internal/session/routing_property_test.go`: Confirmer targets exactly match the gate-valid high-impact predicate.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362049
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001146692
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001325456
+      }
+    ],
+    "8.5 Add Property 5 in `internal/session/routing_property_test.go`: gate and Confirmer transitions cannot produce unsupported confirmation.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362107
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001330187
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001470417
+      }
+    ],
+    "8.6 Add Property 6 in `internal/citation/validate_property_test.go`: whitespace-only variation preserves deterministic successful citation matching.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362174
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001475204
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001626433
+      }
+    ],
+    "8.7 Add Property 7 in `internal/session/round_property_test.go`: the review state remains bounded and requires an attack round before approval.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362242
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001630792
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001917382
+      }
+    ],
+    "8.8 Add Property 8 in new `internal/output/markdown_property_test.go`: terminal finalization preserves available findings and human decisions, renders unavailable values only for partial records, and rejects empty rationales.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362307
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787001922313
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002281461
+      }
+    ],
+    "8.9 Add Property 9 in `internal/session/degradation_property_test.go`: required degradation prevents approval, optional degradation preserves evaluation, and a valid override preserves degradations.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362374
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002286259
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002411305
+      }
+    ],
+    "9.1 After Tasks 6.1 and 7.1 complete, add `cmd/operational_workflow_integration_test.go` using a temporary workspace, mocked Kiro subagent invocations, and the real Magneto MCP handlers.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362440
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002421763
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002696176
+      }
+    ],
+    "9.2 Extend existing citation integration coverage in `internal/citation/validate_test.go` for path traversal, symlink escape, oversized files, heading and line-range scope, and whitespace normalization after the MCP adapter changes.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362503
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002701148
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002907613
+      }
+    ],
+    "10.1 Run `golangci-lint run --fix ./...`, `go vet ./...`, and `go test ./...`; resolve every reported diagnostic or test failure.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362598
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002917750
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787005589892
+      }
+    ],
+    "10.2 Run `rumdl check .kiro/hooks/adversarial-review-trigger.json .kiro/steering/adversarial-review-operational-protocol.md` when the Kiro coordinator configuration is added; resolve Markdown diagnostics before completion.": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994362656
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787005594493
+      },
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787005626885
+      }
+    ],
+    "1. Migrate the canonical finding and session models": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786994933419
+      }
+    ],
+    "2. Implement operational session routing and terminal-state logic": [
+      {
+        "executionId": "30f810c7-dec4-4d1d-9295-88d1f4b19929",
+        "chatSessionId": "sess_ed58ba47-5cb7-4ef6-8796-a8286981c3f4",
+        "timestamp": 1786995717088
+      }
+    ],
+    "3. Extend deterministic MCP finalization and validation surfaces": [
+      {
+        "executionId": "1c73e68d-a97c-4e3b-bb8b-3ec99bc14014",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786996552491
+      }
+    ],
+    "5. Preserve the existing command and record compatibility boundary": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786998529162
+      }
+    ],
+    "6. Narrow isolated Reviewer, Confirmer, and attack prompt inputs": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1786999015290
+      }
+    ],
+    "7. Configure the Kiro hook and operational coordinator protocol": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787000394646
+      }
+    ],
+    "8. Add one property-based test per approved correctness property": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002411385
+      }
+    ],
+    "9. Verify the cross-boundary workflow with focused integration tests": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787002907801
+      }
+    ],
+    "10. Final validation": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787005627013
+      }
+    ],
+    "4. Render the terminal operational review record": [
+      {
+        "executionId": "169ae232-03b1-499f-9279-b6c6f0356894",
+        "chatSessionId": "sess_6d277116-5941-4557-9ef2-a1db07bbcb39",
+        "timestamp": 1787005651738
+      }
+    ]
+  }
+}

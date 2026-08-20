@@ -197,6 +197,13 @@
   stub        = 'configs/stubs/.github/ISSUE_TEMPLATE/'
   destination = '.github/ISSUE_TEMPLATE/'
 
+# GitHub Copilot for PRs
+# https://docs.github.com/en/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review?tool=webui
+[[files]]
+  stub = 'configs/stubs/.github/copilot-instructions.md'
+  source = 'configs/templates/.github/copilot-instructions.md'
+  destination = '.github/copilot-instructions.md'
+
 # GitHub Dependabot config
 # https://docs.github.com/en/code-security/tutorials/secure-your-dependencies/dependabot-quickstart-guide
 [[files]]
