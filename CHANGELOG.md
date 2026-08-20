@@ -8,6 +8,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), adheres t
 
 ### <!-- 0 -->:rocket: Features
 
-* [`959392c`](https://github.com/northwood-labs/magneto/commit/959392cb8547fda6192dc42da44db25c9f007898): Added short flags for install command options. ([@skyzyx](https://github.com/skyzyx))
+* [`2125d4b`](https://github.com/northwood-labs/magneto/commit/2125d4bdf699d2e091693f00108a2390dfda8b3f): Added Adversarial Review Operational Workflow specification. ([@skyzyx](https://github.com/skyzyx))
 
-<p>Generated on 2026-08-14.</p>
+<p>Generated on 2026-08-20.</p>
