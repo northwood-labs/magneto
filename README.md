@@ -1,13 +1,15 @@
 # Magneto
 
-Magneto is an **adversarial citation gate** agent, named after Erik Lehnsherr (aka _Magneto_) from the X-Men universe, and an old friend/adversary of Professor X (aka _Charles Xavier_).
+Magneto is an **adversarial citation gate**, named after Erik Lehnsherr (aka _Magneto_) from the X-Men universe, and an old friend/adversary of Professor X (aka _Charles Xavier_).
 
 <img width="1920" height="818" alt="old-friend" src="https://github.com/user-attachments/assets/aeaaf796-153b-481d-b325-f45074eff138" />
 
 > [!IMPORTANT]
 > **This is an experiment.** We expect that there will be lots of changes and improvements as we use it and dial-in a useful workflow. YMMV. At present, there should be no expectation of support.
 
-A citation gate for AI agents. Magneto is a system containing a deterministic MCP server which validates whether quoted evidence actually exists in the cited artifact — no LLM involved, no hallucination possible.
+Magneto is a non-LLM adversarial citation gate whose job is to prevent hallucinations by fact-checking the agent in real-time, designed for Kiro.
+
+It is a system containing a deterministic MCP server which validates whether quoted evidence genuinely exists in the cited artifact. No LLM involved, no hallucination possible.
 
 When an AI agent claims "the design says X in section Y," Magneto checks. Either the exact text is there, or it isn't. This gives you a ground-truth anchor for adversarial review pipelines where trust in citations is non-negotiable.
 
@@ -25,9 +27,9 @@ AI code review and design review agents produce findings with citations. But cit
 
 ## Prerequisites
 
-* Go 1.26 or later
 * An MCP-compatible AI agent or IDE (Kiro, Claude Desktop, or any client speaking the Model Context Protocol over stdio)
 * The `WORKSPACE_ROOT` environment variable set to your project's root directory
+* At present, this solution only implements Kiro-compatible hooks and steering files. Other tooling will come after the project stabilizes.
 
 ## Installation
 
@@ -44,25 +46,7 @@ magneto version
 
 ## Usage
 
-### As an MCP server
-
-Magneto runs as a subprocess of your AI agent, communicating over stdin/stdout. Configure it in your MCP client settings:
-
-```json
-{
-  "mcpServers": {
-    "magneto": {
-      "command": "magneto",
-      "args": ["serve"],
-      "env": {
-        "WORKSPACE_ROOT": "${workspaceFolder}"
-      }
-    }
-  }
-}
-```
-
-Once running, the agent has access to three tools:
+Once the IDE launches the MCP server, the agent has access to three tools:
 
 #### `validate_citation`
 
