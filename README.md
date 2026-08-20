@@ -9,9 +9,7 @@ Magneto is an **adversarial citation gate**, named after Erik Lehnsherr (aka _Ma
 
 Magneto is a non-LLM adversarial citation gate whose job is to prevent hallucinations by fact-checking the agent in real-time, designed for Kiro.
 
-It is a system containing a deterministic MCP server which validates whether quoted evidence genuinely exists in the cited artifact. No LLM involved, no hallucination possible.
-
-When an AI agent claims "the design says X in section Y," Magneto checks. Either the exact text is there, or it isn't. This gives you a ground-truth anchor for adversarial review pipelines where trust in citations is non-negotiable.
+It is a deterministic MCP server that validates whether quoted evidence genuinely exists in the cited artifact. No LLM involved, no hallucination possible. When an AI agent claims "the design says X in section Y," Magneto checks. Either the exact text is there, or it isn't. This gives you a ground-truth anchor for adversarial review pipelines where trust in citations is non-negotiable.
 
 ## What it solves
 
@@ -19,11 +17,15 @@ AI code review and design review agents produce findings with citations. But cit
 
 * **Deterministic verification.** Exact substring matching after whitespace normalization. No probability scores, no "close enough."
 
-* **Zero trust by default.** Findings with invalid citations are automatically downgraded to "unconfirmed."
+* **Provenance-correlated validation.** Each finding flows through a causal chain — schema validation, citation validation, session finalization — all tracked by correlation IDs within a single process. Fabricated or replayed results are rejected.
+
+* **Zero trust by default.** Findings with invalid citations are automatically downgraded to "unconfirmed." Findings that assert their own validation status are rejected outright.
 
 * **Workspace-contained.** File reads are symlink-resolved and path-checked. The server cannot be tricked into reading outside your project.
 
 * **Size-bounded.** Files are read in 1 MiB chunks with a 64 MiB hard cap. No OOM from oversized artifacts.
+
+* **Idempotent finalization.** Terminal review records are written exactly once per session, even if the finalization tool is retried.
 
 ## Prerequisites
 
@@ -38,15 +40,34 @@ go install go.nwlabs.dev/magneto@latest
 magneto install kiro --workspace
 ```
 
+The `install kiro` command writes Kiro integration files (steering, hooks, MCP configuration) from the compiled binary into your project's `.kiro/` directory. Use `--user` instead of `--workspace` to install to `$HOME/.kiro/` for user-level configuration.
+
 Verify it works:
 
 ```bash
 magneto version
 ```
 
+### Configuration options
+
+```bash
+# Install to the current workspace (most common)
+magneto install kiro --workspace
+
+# Install to user-level Kiro config
+magneto install kiro --user
+
+# Custom MCP server name (default: "magneto")
+magneto install kiro --workspace --mcp-server-name my-citation-gate
+```
+
+The installer merges the MCP server definition into your existing `mcp.json` without disturbing other server entries. Running it again updates the Magneto entry to the latest version.
+
 ## Usage
 
-Once the IDE launches the MCP server, the agent has access to three tools:
+### MCP tools
+
+Once the IDE launches the MCP server, the agent has access to four tools:
 
 #### `validate_citation`
 
@@ -64,6 +85,8 @@ Returns `valid: true` with the matching line range, or `valid: false` with a fai
 
 The `section_reference` can be either a Markdown heading name (e.g., `"Architecture"`) or a line range (e.g., `"lines 45-60"`).
 
+For provenance-correlated sessions, include `session_id`, `finding_index`, and `schema_provenance_correlation_id` to link the citation result to a prior schema validation.
+
 #### `validate_findings_batch`
 
 Validates citations for multiple findings in a single call. Useful when an agent produces several findings at once and you want to gate them all before proceeding.
@@ -72,14 +95,14 @@ Validates citations for multiple findings in a single call. Useful when an agent
 {
   "findings": [
     {
-      "QuotedExcerpt": "short-lived tokens with automatic rotation",
-      "FilePath": "docs/design.md",
-      "SectionReference": "Security"
+      "quoted_excerpt": "short-lived tokens with automatic rotation",
+      "file_path": "docs/design.md",
+      "section_reference": "Security"
     },
     {
-      "QuotedExcerpt": "nonexistent claim about the system",
-      "FilePath": "docs/design.md",
-      "SectionReference": "Overview"
+      "quoted_excerpt": "nonexistent claim about the system",
+      "file_path": "docs/design.md",
+      "section_reference": "Overview"
     }
   ]
 }
@@ -95,7 +118,9 @@ Validates that a finding object has all required fields with valid values before
 {
   "finding": {
     "criterion_name": "context-isolation",
-    "score": 8,
+    "criterion_satisfaction": 8,
+    "finding_severity": "high",
+    "finding_domains": ["security", "correctness"],
     "quoted_excerpt": "reviewer subagent receives only the artifact",
     "artifact_location": {
       "file_path": "docs/design.md",
@@ -107,27 +132,46 @@ Validates that a finding object has all required fields with valid values before
 }
 ```
 
-Required fields: `criterion_name`, `score` (1-10), `quoted_excerpt`, `artifact_location.file_path`, `artifact_location.section_reference`, `status`.
+Required fields: `criterion_name`, `criterion_satisfaction` (1-10), `finding_severity` (critical/high/medium/low), `finding_domains` (one or more of: security, correctness, architecture, reliability, operations, developer-experience), `quoted_excerpt`, `artifact_location.file_path`, `artifact_location.section_reference`, `status` (must be `hypothesized` for proposed findings), `reasoning`.
 
-### As a CLI review command
+When `session_id` and `finding_index` are provided, the tool returns a `provenance_correlation_id` that links to subsequent citation validation.
 
-Run a standalone adversarial review pass against a design artifact:
+#### `finalize_review_session`
 
-```bash
-export WORKSPACE_ROOT=/path/to/your/project
+Validates a terminal review session assembled from deterministic validation results and persists it as a Markdown record.
 
-magneto review docs/design.md \
-  --spec-name "auth-redesign" \
-  --domain "auth"
+```json
+{
+  "session": {
+    "metadata": {
+      "spec_name": "auth-redesign",
+      "artifact_path": ".kiro/specs/auth-redesign/design.md",
+      "timestamp": "2026-08-20T14:30:00Z",
+      "terminal_status": "not_approved",
+      "task_execution_id": "task-abc-123",
+      "session_id": "review-xyz-456",
+      "rounds_executed": 3
+    },
+    "findings": []
+  }
+}
 ```
 
-This classifies the artifact against blast-radius domains, runs the review framework, and writes a structured Markdown report to `.kiro/reviews/auth-redesign-2026-08-14-1.md`.
+Returns the terminal status, idempotency key, and the path where the review record was written (e.g., `.kiro/reviews/auth-redesign-2026-08-20-1.md`).
 
-Blast-radius domains that trigger mandatory review: `auth`, `secrets`, `payments`, `data-integrity`, `irreversible-actions`.
+### Blast-radius domains
+
+These domains trigger mandatory adversarial review when detected in a design artifact:
+
+* `auth`
+* `secrets`
+* `payments`
+* `data-integrity`
+* `irreversible-actions`
 
 ## How tests work
 
-The test suite covers citation validation, schema enforcement, session state management, trigger classification, and output rendering:
+The test suite covers citation validation, schema enforcement, session state management, trigger classification, output rendering, and Kiro file installation:
 
 ```bash
 go test ./...
@@ -137,11 +181,15 @@ Key test categories:
 
 * **Citation validation** (`internal/citation/`) — verifies exact matching, section boundary detection, whitespace normalization, path traversal rejection, symlink escape prevention, and file size limits.
 
-* **Session management** (`internal/session/`) — verifies round progression, novelty detection, degradation tracking, and citation downgrade logic.
+* **Schema validation** (`internal/schema/`) — verifies field-level validation, legacy score migration, domain normalization, and assertion field rejection.
 
-* **Integration tests** (`cmd/`) — verifies the full pipeline from MCP tool invocation through validation to output file generation.
+* **Session management** (`internal/session/`) — verifies round progression, novelty detection, degradation tracking, citation downgrade logic, Confirmer routing, and terminal finalization.
 
-* **Property-based tests** (`internal/citation/validate_property_test.go`) — fuzz-style tests that exercise validation with randomized inputs.
+* **Kiro file installation** (`internal/kirofiles/`) — verifies MCP config merge, server name validation, and embedded file access.
+
+* **Output rendering** (`internal/output/`) — verifies Markdown rendering, filename generation, and idempotent terminal record persistence.
+
+* **Property-based tests** — fuzz-style tests using `pgregory.net/rapid` that exercise validation with randomized inputs.
 
 Run a specific package:
 
@@ -185,6 +233,14 @@ The file path must resolve to a location within `WORKSPACE_ROOT` after symlink r
 ### "cited file exceeds maximum allowed size"
 
 Magneto rejects files larger than 64 MiB. If your artifact exceeds this limit, split it into smaller documents and cite the relevant section.
+
+### Schema validation rejects proposed findings
+
+Proposed findings must use `status: "hypothesized"`. Magneto rejects findings that assert their own validation status (`confirmed`, `citation_valid`, `citation_gate_result`). These fields are reserved for deterministic processing by Magneto itself.
+
+### "deterministic validation provenance does not match"
+
+In canonical mode (with `session_id` + `finding_index`), citation validation requires a matching `schema_provenance_correlation_id` from a prior `validate_finding_schema` call. Ensure schema validation completes first and you pass the returned correlation ID.
 
 ## License
 

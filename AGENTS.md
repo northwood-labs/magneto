@@ -4,7 +4,7 @@ This file provides guidance for AI agents working in this repository.
 
 ## Project overview
 
-Magneto is a deterministic, non-LLM MCP server that validates citation evidence in adversarial review findings. It verifies quoted excerpts exist verbatim within cited artifact locations. The binary exposes three MCP tools over stdin/stdout and a `review` command that orchestrates the adversarial review pipeline.
+Magneto is a deterministic, non-LLM MCP server that validates citation evidence in adversarial review findings. It verifies quoted excerpts exist verbatim within cited artifact locations. The binary exposes four MCP tools over stdin/stdout, a deprecated `review` command, and an `install kiro` command that distributes embedded integration files.
 
 Module path: `go.nwlabs.dev/magneto`
 
@@ -26,20 +26,29 @@ Module path: `go.nwlabs.dev/magneto`
 
 ```text
 main.go                  → Entrypoint, delegates to cmd.Execute()
-cmd/                     → CLI commands, MCP tool handlers, sentinel errors
+cmd/
+  root.go                → Root command, Execute(), --verbose flag
+  serve.go               → MCP stdio server lifecycle
+  tools.go               → MCP tool definitions, handlers, provenance registry
+  review.go              → Deprecated compatibility wrapper
+  install.go             → Parent "install" command
+  install_kiro.go        → "install kiro" subcommand, flag handling, orchestration
+  errors.go              → All sentinel errors grouped by domain
+  version.go             → Version display (cli-helpers)
 internal/
   citation/              → Path-safe file reading, section extraction, citation matching
+  kirofiles/             → Embedded Kiro assets (embed.FS), MCP config merge, validation
   models/                → Shared data types (ReviewFinding, SessionOutput, etc.)
   novelty/               → Inter-round novelty detection
-  output/                → Markdown rendering and filename generation
+  output/                → Markdown rendering, filename generation, terminal record persistence
   prompt/                → Context-isolated prompt builders for subagents
-  schema/                → ReviewFinding schema validation
-  session/               → Round state machine, degradation tracking, citation downgrade
+  schema/                → ReviewFinding schema validation and legacy score migration
+  session/               → Round state machine, degradation tracking, citation downgrade, finalization
   trigger/               → Blast-radius trigger classification
 docs/                    → Architecture documentation
 tools/                   → Brewfiles, Taskfile includes
 .kiro/
-  steering/              → Agent steering files (always-on + manual)
+  steering/              → Agent steering files (always-on + conditional + manual)
   hooks/                 → Agent hooks (PostTaskExec trigger)
   specs/                 → Kiro spec definitions
 ```
@@ -103,6 +112,10 @@ task clean         # run all cleaning tasks
 
 * **Degradation invariant:** A degraded session can never reach `approved` status — only `partial_review`.
 
+* **Provenance correlation:** Terminal review records require findings validated by deterministic gate results issued by the same MCP process. Fabricated or replayed provenance IDs are rejected.
+
+* **Outcome assertion rejection:** MCP tool requests that assert validation outcomes (e.g., `citation_valid`, `confirmed`) are rejected with `ErrToolOutcomeAssertion`.
+
 ## Testing
 
 * Use `github.com/go-openapi/testify` for assertions (`assert`, `require`).
@@ -121,25 +134,34 @@ task clean         # run all cleaning tasks
 
 Steering files in `.kiro/steering/` provide additional context to agents:
 
-| File                                             | Inclusion        | Purpose                                       |
-|--------------------------------------------------|------------------|-----------------------------------------------|
-| `core-premises.md`                               | always           | Four core principles for all agent work       |
-| `go-code-conventions.md`                         | fileMatch `*.go` | Full Go coding standards and lint rules       |
-| `markdown-style.md`                              | fileMatch `*.md` | Markdown formatting rules (enforced by rumdl) |
-| `adversarial-review-rubric.md`                   | manual           | Scoring guidance for review criteria          |
-| `adversarial-review-anti-patterns.md`            | manual           | Known failure patterns to watch for           |
-| `adversarial-review-architecture-constraints.md` | manual           | Blast-radius domains and foundational trust   |
-| `comprehensive-and-quickstart.md`                | manual           | Instructions for generating architecture docs |
-| `generate-agents-md.md`                          | manual           | Instructions for generating this file         |
-| `go-cli-application.md`                          | manual           | Patterns for Go CLI/TUI applications          |
-| `root-level-readme.md`                           | manual           | Instructions for README generation            |
-| `add-code-comments.md`                           | manual           | Instructions for adding code comments         |
+| File                                             | Inclusion        | Purpose                                            |
+|--------------------------------------------------|------------------|----------------------------------------------------|
+| `core-premises.md`                               | always           | Four core principles for all agent work            |
+| `go-code-conventions.md`                         | fileMatch `*.go` | Full Go coding standards and lint rules            |
+| `go-cli-application.md`                          | auto             | Patterns for Go CLI/TUI applications               |
+| `markdown-style.md`                              | fileMatch `*.md` | Markdown formatting rules (enforced by rumdl)      |
+| `adversarial-review-rubric.md`                   | manual           | Scoring guidance for review criteria               |
+| `adversarial-review-anti-patterns.md`            | manual           | Known failure patterns to watch for                |
+| `adversarial-review-architecture-constraints.md` | manual           | Blast-radius domains and foundational trust        |
+| `adversarial-review-operational-protocol.md`     | manual           | Full Kiro coordinator protocol for review sessions |
+| `comprehensive-and-quickstart.md`                | manual           | Instructions for generating architecture docs      |
+| `generate-agents-md.md`                          | manual           | Instructions for generating this file              |
+| `root-level-readme.md`                           | manual           | Instructions for README generation                 |
+| `add-code-comments.md`                           | manual           | Instructions for adding code comments              |
 
 ## Hooks
 
 | Hook                         | Trigger      | Behavior                                                                                                                 |
 |------------------------------|--------------|--------------------------------------------------------------------------------------------------------------------------|
 | `adversarial-review-trigger` | PostTaskExec | Prompts the agent to check if a design artifact changed and, if it touches a blast-radius domain, run adversarial review |
+
+## Specs
+
+| Spec                                      | Purpose                                                                    |
+|-------------------------------------------|----------------------------------------------------------------------------|
+| `adversarial-review-agent`                | Phase 1 adversarial reviewer — context isolation, citation gate, confirmer |
+| `adversarial-review-operational-workflow` | Operational round-state machine — Kiro-native end-to-end workflow          |
+| `install-kiro-command`                    | CLI install command for distributing Kiro integration files                |
 
 ## Verification workflow (after any code change)
 
@@ -152,9 +174,12 @@ Steering files in `.kiro/steering/` provide additional context to agents:
 
 1. **Deterministic validation.** Citation matching uses exact string comparison after whitespace normalization. No LLM inference.
 2. **Context isolation.** Subagent prompts intentionally exclude author session content.
-3. **Novelty-based stopping.** Review rounds terminate when findings are non-novel (prevents infinite loops).
-4. **MCP stdio transport.** No HTTP, no ports — agents spawn the binary as a subprocess.
-5. **Workspace containment.** All file reads are path-checked and symlink-resolved against `WORKSPACE_ROOT`.
+3. **Provenance correlation.** Schema → citation → finalization form a causal chain verified within a single MCP process lifetime.
+4. **Novelty-based stopping.** Review rounds terminate when findings are non-novel (prevents infinite loops).
+5. **MCP stdio transport.** No HTTP, no ports — agents spawn the binary as a subprocess.
+6. **Workspace containment.** All file reads are path-checked and symlink-resolved against `WORKSPACE_ROOT`.
+7. **Idempotent finalization.** Terminal records are written exactly once per session regardless of retry attempts.
+8. **Embedded file distribution.** `install kiro` uses Go's `embed.FS` for zero-runtime-dependency file installation.
 
 ## Common pitfalls
 
@@ -164,3 +189,5 @@ Steering files in `.kiro/steering/` provide additional context to agents:
 * Creating `var` blocks inside Cobra `RunE` closures (convert to short declarations).
 * Breaking comment lines early — use full 80-char width.
 * Using `*text*` for italic or `__text__` for bold — use `_text_` and `**text**`.
+* Submitting assertion fields in MCP tool requests (the server rejects them).
+* Forgetting `session_id` + `finding_index` in canonical validation requests (provenance is required).
