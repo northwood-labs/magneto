@@ -6,8 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com), adheres t
 
 ## Unreleased
 
-### <!-- 0 -->:rocket: Features
+### :books: Documentation
 
-* [`2125d4b`](https://github.com/northwood-labs/magneto/commit/2125d4bdf699d2e091693f00108a2390dfda8b3f): Added Adversarial Review Operational Workflow specification. ([@skyzyx](https://github.com/skyzyx))
+* [`7c452e3`](https://github.com/northwood-labs/magneto/commit/7c452e30e143721b53d5923703ee42d78cb95276): Revise `README.md` for clarity and updated functionality. ([@skyzyx](https://github.com/skyzyx))
 
 <p>Generated on 2026-08-20.</p>
