@@ -52,9 +52,7 @@ type (
 func loadHookConfig(t *testing.T) *hookConfig {
 	t.Helper()
 
-	hookPath := filepath.Join(
-		"..", ".kiro", "hooks", "adversarial-review-trigger.json",
-	)
+	hookPath := filepath.Join("..", ".kiro", "hooks", "adversarial-review-trigger.json")
 
 	data, readErr := os.ReadFile(hookPath) // lint:allow_dynamic_filename
 	require.NoError(t, readErr, "failed to read hook configuration file")

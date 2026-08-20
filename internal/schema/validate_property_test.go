@@ -229,10 +229,7 @@ func assertSatisfactionClamped(t *rapid.T, satisfaction int) {
 	}
 }
 
-func assertSeverityPreserved(
-	t *rapid.T,
-	actual, expected models.FindingSeverity,
-) {
+func assertSeverityPreserved(t *rapid.T, actual, expected models.FindingSeverity) {
 	if actual != expected {
 		t.Fatalf("severity changed from %q to %q", expected, actual)
 	}
@@ -286,16 +283,12 @@ func assertDimensionsIndependent(t *rapid.T, input *dimensionIndependenceInput) 
 
 	altErr := schema.ValidateFindingSchema(altFinding)
 	if altErr != nil {
-		t.Fatalf(
-			"expected no validation error for alt finding, got: %v",
-			altErr,
-		)
+		t.Fatalf("expected no validation error for alt finding, got: %v", altErr)
 	}
 
 	if altFinding.FindingSeverity != input.Severity {
 		t.Fatalf(
-			"severity derived from satisfaction: changed satisfaction "+
-				"from %d to %d and severity changed from %q to %q",
+			"severity derived from satisfaction: changed satisfaction from %d to %d and severity changed from %q to %q",
 			input.RawSatisfaction,
 			altSatisfaction,
 			input.Severity,
@@ -305,8 +298,7 @@ func assertDimensionsIndependent(t *rapid.T, input *dimensionIndependenceInput) 
 
 	if len(altFinding.FindingDomains) != len(input.Finding.FindingDomains) {
 		t.Fatalf(
-			"domains derived from satisfaction: domain count changed "+
-				"from %d to %d when satisfaction changed",
+			"domains derived from satisfaction: domain count changed from %d to %d when satisfaction changed",
 			len(input.Finding.FindingDomains),
 			len(altFinding.FindingDomains),
 		)
@@ -315,8 +307,7 @@ func assertDimensionsIndependent(t *rapid.T, input *dimensionIndependenceInput) 
 	for i, domain := range input.Finding.FindingDomains {
 		if altFinding.FindingDomains[i] != domain {
 			t.Fatalf(
-				"domains derived from satisfaction: domain[%d] "+
-					"changed from %q to %q when satisfaction changed",
+				"domains derived from satisfaction: domain[%d] changed from %q to %q when satisfaction changed",
 				i,
 				domain,
 				altFinding.FindingDomains[i],
