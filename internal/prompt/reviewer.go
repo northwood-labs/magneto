@@ -19,19 +19,33 @@ import (
 	"strings"
 )
 
-// ReviewerInput contains the parameters for building the Reviewer subagent's
-// environmental context.
-type ReviewerInput struct {
-	ArtifactPath  string
-	RubricContent string
-	PriorFindings string
-	RoundNumber   int
-}
+type (
+	// FailureFingerprint is an opaque reference to a prior-round failure. It
+	// contains only the criterion name, canonical satisfaction score, and a
+	// normalized evidence hash. It intentionally excludes all reasoning,
+	// intermediate outputs, and author context to maintain context isolation.
+	FailureFingerprint struct {
+		CriterionName         string
+		EvidenceHash          string
+		CriterionSatisfaction int
+	}
+
+	// ReviewerInput contains the parameters for building the Reviewer
+	// subagent's environmental context.
+	ReviewerInput struct {
+		ArtifactPath             string
+		RubricContent            string
+		AllowedPaths             []string
+		PriorFailureFingerprints []FailureFingerprint
+		RoundNumber              int
+	}
+)
 
 // BuildReviewerContext constructs the environmental_context for the Reviewer
-// subagent. This contains ONLY the artifact location, rubric criteria, and
-// round metadata. It explicitly excludes any Author session content to maintain
-// context isolation.
+// subagent. This contains ONLY the artifact location, rubric criteria, round
+// metadata, allowed repository paths, and opaque prior-failure fingerprints. It
+// explicitly excludes any Author session content, prior finding reasoning,
+// intermediate outputs, and mutable capabilities to maintain context isolation.
 func BuildReviewerContext(input *ReviewerInput) string {
 	var b strings.Builder
 
@@ -44,9 +58,30 @@ func BuildReviewerContext(input *ReviewerInput) string {
 	fmt.Fprint(&b, "## Round Metadata\n\n")
 	fmt.Fprintf(&b, "Round: %d of 5\n\n", input.RoundNumber)
 
-	if input.PriorFindings != "" {
-		fmt.Fprint(&b, "## Prior Round Findings\n\n")
-		fmt.Fprintf(&b, "%s\n", input.PriorFindings)
+	if len(input.AllowedPaths) > 0 {
+		fmt.Fprint(&b, "## Allowed Repository Paths\n\n")
+
+		for _, p := range input.AllowedPaths {
+			fmt.Fprintf(&b, "- %s\n", p)
+		}
+
+		fmt.Fprint(&b, "\n")
+	}
+
+	if len(input.PriorFailureFingerprints) > 0 {
+		fmt.Fprint(&b, "## Prior Failure Fingerprints\n\n")
+
+		for _, fp := range input.PriorFailureFingerprints {
+			fmt.Fprintf(
+				&b,
+				"- criterion=%s satisfaction=%d hash=%s\n",
+				fp.CriterionName,
+				fp.CriterionSatisfaction,
+				fp.EvidenceHash,
+			)
+		}
+
+		fmt.Fprint(&b, "\n")
 	}
 
 	return b.String()

@@ -187,9 +187,9 @@ The fix should always rename the INNER variable, not the outer one. Choose a nam
 Line length is 120 characters. Do not break too early. Do not break too late. Common sources and fixes:
 
 * **Struct tags with `jsonschema` descriptions:** These are inherently long and cannot be broken across lines in Go. Use `// lint:ignore_length` on the same line. Remove alignment padding between tag groups to minimize length.
-* **Format strings in `fmt.Sprintf`/`fmt.Errorf`:** Break the string using `+` concatenation across lines.
-* **Long comments:** Wrap to the next line.
-* **Test string literals:** Use `+` concatenation to break across lines.
+* DO NOT ADD LINEBREAKS -- EXCEPT for after the `{` character (where the `{` character is Go code and not inside of a string). The `golangci-lint run --fix` command is responsible for wrapping lines of code.
+* **Format strings in `fmt.Sprintf`/`fmt.Errorf`:** IF -- and ONLY IF -- a line containing a Go string is still long AFTER running `golangci-lint run --fix`, you MAY break the string using `+` concatenation across lines. But ONLY under these specific circumstances.
+* **Long comments:** Comments MUST wrap at 80 characters (where a tab character (`\t`)) counts as 4 spaces. When using a `//` prefix to begin a lint comment, those two characters (plus a space) are subtracted from the 80 characters leaving 77 characters. If a word does not fit on the line completely within that 80 character limit, the comment should wrap to the next line. DO NOT wrap comments early. DO NOT wrap comments late.
 
 **Struct tag alignment:** When struct tags trigger lll, first remove all alignment padding (extra spaces between tag groups like `json:`, `jsonschema:`, `toml:`). If still over 120 chars after removing padding, add `// lint:ignore_length`.
 

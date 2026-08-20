@@ -22,18 +22,20 @@ import (
 
 type (
 	// DegradationTracker records component failures during a review session and
-	// enforces the invariant that degraded sessions never produce "approved"
-	// terminal status.
+	// distinguishes required failures from auditable optional failures.
 	DegradationTracker struct {
 		entries []models.DegradationEntry
 	}
 
 	// RecordFailureInput contains the parameters for recording a component
-	// failure.
+	// failure. An omitted criticality remains required for compatibility and to
+	// preserve the conservative legacy safety behavior.
 	RecordFailureInput struct {
-		Component        string
-		FailureMode      string
-		AffectedCriteria []string
+		Component           string
+		FailureMode         string
+		UnavailableValueKey string
+		Criticality         models.ComponentCriticality
+		AffectedCriteria    []string
 	}
 )
 
@@ -42,34 +44,58 @@ func NewDegradationTracker() *DegradationTracker {
 	return &DegradationTracker{}
 }
 
-// RecordFailure records a component failure during the session.
+// RecordFailure records an auditable component failure during the session.
 func (dt *DegradationTracker) RecordFailure(input *RecordFailureInput) {
+	criticality := input.Criticality
+	if criticality == "" {
+		criticality = models.CriticalityRequired
+	}
+
 	entry := models.DegradationEntry{
-		Component:        input.Component,
-		FailureMode:      input.FailureMode,
-		AffectedCriteria: input.AffectedCriteria,
-		Timestamp:        time.Now().UTC().Format(time.RFC3339),
+		Component:           input.Component,
+		FailureMode:         input.FailureMode,
+		Timestamp:           time.Now().UTC().Format(time.RFC3339),
+		Criticality:         criticality,
+		UnavailableValueKey: input.UnavailableValueKey,
+		AffectedCriteria:    append([]string(nil), input.AffectedCriteria...),
 	}
 
 	dt.entries = append(dt.entries, entry)
 }
 
-// IsDegraded returns true if any component failures have been recorded.
+// IsDegraded returns true if any required or optional component failures have
+// been recorded.
 func (dt *DegradationTracker) IsDegraded() bool {
 	return len(dt.entries) > 0
 }
 
-// Entries returns all recorded degradation entries.
-func (dt *DegradationTracker) Entries() []models.DegradationEntry {
-	return dt.entries
+// HasRequiredFailure returns true if a required workflow component failed.
+func (dt *DegradationTracker) HasRequiredFailure() bool {
+	return hasRequiredDegradation(dt.entries)
 }
 
-// AllowedTerminalStatus returns the appropriate terminal status given the
-// degradation state. If degraded and proposed is TerminalApproved, only
-// TerminalPartialReview is allowed. If not degraded, the proposed status is
-// returned unchanged.
+// Entries returns a copy of all recorded degradation entries.
+func (dt *DegradationTracker) Entries() []models.DegradationEntry {
+	entries := make([]models.DegradationEntry, len(dt.entries))
+	copy(entries, dt.entries)
+
+	for index := range entries {
+		entries[index].AffectedCriteria = append([]string(nil), entries[index].AffectedCriteria...)
+	}
+
+	return entries
+}
+
+// AllowedTerminalStatus enforces terminal-status precedence for degradation
+// state. Required failures downgrade proposed approval to partial review;
+// optional failures remain auditable while preserving approval evaluation. A
+// caller may preserve human_override only after validating its rationale.
 func (dt *DegradationTracker) AllowedTerminalStatus(proposed models.TerminalStatus) models.TerminalStatus {
-	if dt.IsDegraded() && proposed == models.TerminalApproved {
+	if proposed == models.TerminalHumanOverride {
+		return proposed
+	}
+
+	if dt.HasRequiredFailure() && proposed == models.TerminalApproved {
 		return models.TerminalPartialReview
 	}
 

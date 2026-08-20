@@ -49,9 +49,9 @@ func TestProperty_UncitedFindingsAlwaysDowngraded(t *testing.T) {
 			statusIdx := rapid.IntRange(0, len(nonUnconfirmedStatuses)-1).Draw(t, "status_idx")
 
 			findings[i] = models.ReviewFinding{
-				CriterionName: rapid.StringMatching(`[a-z]{3,12}-[a-z]{3,12}`).Draw(t, "criterion"),
-				Score:         rapid.IntRange(1, 10).Draw(t, "score"),
-				QuotedExcerpt: rapid.StringMatching(`[a-zA-Z0-9 ]{10,60}`).Draw(t, "excerpt"),
+				CriterionName:         rapid.StringMatching(`[a-z]{3,12}-[a-z]{3,12}`).Draw(t, "criterion"),
+				CriterionSatisfaction: rapid.IntRange(1, 10).Draw(t, "score"),
+				QuotedExcerpt:         rapid.StringMatching(`[a-zA-Z0-9 ]{10,60}`).Draw(t, "excerpt"),
 				ArtifactLocation: models.ArtifactLocation{
 					FilePath:         rapid.StringMatching(`[a-z]{3,10}/[a-z]{3,10}\.md`).Draw(t, "path"),
 					SectionReference: rapid.StringMatching(`[A-Z][a-z]{3,12}`).Draw(t, "section"),

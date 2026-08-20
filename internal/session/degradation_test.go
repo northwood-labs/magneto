@@ -134,6 +134,61 @@ func TestDegradationTracker(t *testing.T) {
 			},
 		},
 		{
+			name: "omitted criticality defaults to required",
+			fn: func(t *testing.T) {
+				t.Helper()
+
+				dt := session.NewDegradationTracker()
+				dt.RecordFailure(&session.RecordFailureInput{
+					Component:        "reviewer",
+					FailureMode:      "unavailable",
+					AffectedCriteria: []string{"architecture"},
+				})
+
+				entries := dt.Entries()
+				assert.Equal(t, models.CriticalityRequired, entries[0].Criticality)
+				assert.True(t, dt.HasRequiredFailure())
+				assert.Equal(t, models.TerminalPartialReview, dt.AllowedTerminalStatus(models.TerminalApproved))
+			},
+		},
+		{
+			name: "optional failure preserves approval evaluation",
+			fn: func(t *testing.T) {
+				t.Helper()
+
+				dt := session.NewDegradationTracker()
+				dt.RecordFailure(&session.RecordFailureInput{
+					Component:        "attempt-detail-persistence",
+					FailureMode:      "write unavailable",
+					AffectedCriteria: []string{"security-boundaries"},
+					Criticality:      models.CriticalityOptional,
+				})
+
+				result := dt.AllowedTerminalStatus(models.TerminalApproved)
+
+				assert.True(t, dt.IsDegraded())
+				assert.False(t, dt.HasRequiredFailure())
+				assert.Equal(t, models.TerminalApproved, result)
+			},
+		},
+		{
+			name: "human override takes precedence over required degradation",
+			fn: func(t *testing.T) {
+				t.Helper()
+
+				dt := session.NewDegradationTracker()
+				dt.RecordFailure(&session.RecordFailureInput{
+					Component:        "citation-gate",
+					FailureMode:      "unreachable",
+					AffectedCriteria: []string{"error-handling"},
+				})
+
+				result := dt.AllowedTerminalStatus(models.TerminalHumanOverride)
+
+				assert.Equal(t, models.TerminalHumanOverride, result)
+			},
+		},
+		{
 			name: "approved status unchanged when not degraded",
 			fn: func(t *testing.T) {
 				t.Helper()

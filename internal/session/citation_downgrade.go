@@ -16,71 +16,168 @@ package session
 
 import "go.nwlabs.dev/magneto/internal/models"
 
+const (
+	// CitationFailureMissingEvidence identifies a finding without the evidence
+	// required for deterministic citation validation.
+	CitationFailureMissingEvidence = "missing required citation evidence"
+
+	// CitationFailureResultUnavailable identifies a finding that did not receive
+	// a deterministic citation result.
+	CitationFailureResultUnavailable = "citation validation result unavailable"
+)
+
 type (
-	// DowngradeInput contains the parameters for downgrading uncited findings.
+	// DowngradeInput contains the findings and deterministic citation outcomes
+	// used to apply the citation gate before confirmation routing.
 	DowngradeInput struct {
 		Findings          []models.ReviewFinding
 		ValidationResults []CitationValidationResult
 	}
 
-	// CitationValidationResult represents the validation outcome for a single
-	// finding's citation.
+	// CitationValidationResult represents the deterministic schema and citation
+	// outcome for one finding.
 	CitationValidationResult struct {
-		FailureReason string
-		FindingIndex  int
-		CitationValid bool
+		MatchedLines            *models.CitationMatchedLines
+		FailureReason           string
+		ProvenanceCorrelationID string
+		GateAvailability        GateAvailability
+		FindingIndex            int
+		SchemaValid             bool
+		CitationValid           bool
 	}
 )
 
-// DowngradeUncitedFindings marks findings as "unconfirmed" when their citation
-// validation fails. A finding is downgraded if:
-//
-//  1. It has no quoted excerpt (missing citation)
-//  2. It has no artifact location (missing citation)
-//  3. Its citation validation result indicates failure (verbatim match failed)
-//
-// Findings that already have valid citations keep their original status
-// unchanged.
+// DowngradeUncitedFindings applies deterministic citation outcomes without
+// mutating its input. Invalid or unavailable results cannot route to a
+// Confirmer or satisfy approval, while a valid gate leaves findings
+// hypothesized until confirmation handling runs.
 func DowngradeUncitedFindings(input *DowngradeInput) []models.ReviewFinding {
-	results := make([]models.ReviewFinding, len(input.Findings))
-	copy(results, input.Findings)
+	results := copyFindings(input.Findings)
+	validationByIndex := validationResultsByFindingIndex(input.ValidationResults)
 
-	// Build a lookup of validation results by finding index.
-	validationByIndex := make(map[int]CitationValidationResult, len(input.ValidationResults))
-	for _, vr := range input.ValidationResults {
-		validationByIndex[vr.FindingIndex] = vr
-	}
-
-	for i := range results {
-		if hasMissingCitation(&results[i]) {
-			results[i].Status = models.StatusUnconfirmed
+	for index := range results {
+		validation, exists := validationByIndex[index]
+		if !exists {
+			setCitationFailure(&results[index], CitationFailureResultUnavailable)
 
 			continue
 		}
 
-		vr, exists := validationByIndex[i]
-		if exists && !vr.CitationValid {
-			results[i].Status = models.StatusUnconfirmed
-		}
+		applyCitationValidation(&results[index], validation)
 	}
 
 	return results
 }
 
+// validationResultsByFindingIndex returns the final reported validation result
+// for each finding index.
+func validationResultsByFindingIndex(results []CitationValidationResult) map[int]CitationValidationResult {
+	byFindingIndex := make(map[int]CitationValidationResult, len(results))
+	for _, result := range results {
+		byFindingIndex[result.FindingIndex] = result
+	}
+
+	return byFindingIndex
+}
+
+// applyCitationValidation records one deterministic gate outcome and applies
+// the status that outcome permits.
+func applyCitationValidation(finding *models.ReviewFinding, validation CitationValidationResult) {
+	if validation.GateAvailability == GateUnavailable {
+		setGateUnavailable(finding, validation)
+
+		return
+	}
+
+	finding.CitationGateResult = citationGateResult(&validation)
+	if hasMissingCitation(finding) {
+		setCitationFailure(finding, CitationFailureMissingEvidence)
+
+		return
+	}
+
+	if !validation.SchemaValid || !validation.CitationValid {
+		setCitationFailure(finding, validation.FailureReason)
+
+		return
+	}
+
+	finding.Status = models.StatusHypothesized
+}
+
+// setGateUnavailable records that a required deterministic gate could not run.
+func setGateUnavailable(finding *models.ReviewFinding, validation CitationValidationResult) {
+	finding.CitationGateResult = citationGateResult(&validation)
+	finding.CitationGateResult.SchemaValid = false
+	finding.CitationGateResult.CitationValid = false
+	finding.Status = models.StatusUncheckedGateUnavail
+}
+
+// setCitationFailure records a deterministic gate failure and prevents
+// confirmation or approval based on the affected finding.
+func setCitationFailure(finding *models.ReviewFinding, failureReason string) {
+	if failureReason == "" {
+		failureReason = CitationFailureMissingEvidence
+	}
+
+	if finding.CitationGateResult == nil {
+		finding.CitationGateResult = &models.CitationGateResult{}
+	}
+
+	finding.CitationGateResult.SchemaValid = false
+	finding.CitationGateResult.CitationValid = false
+	finding.CitationGateResult.FailureReason = failureReason
+	finding.Status = models.StatusUnconfirmed
+}
+
+// citationGateResult copies the evidence retained from a deterministic gate
+// response so the caller's findings and response values remain immutable.
+func citationGateResult(validation *CitationValidationResult) *models.CitationGateResult {
+	return &models.CitationGateResult{
+		MatchedLines:            copyMatchedLines(validation.MatchedLines),
+		FailureReason:           validation.FailureReason,
+		ProvenanceCorrelationID: validation.ProvenanceCorrelationID,
+		SchemaValid:             validation.SchemaValid,
+		CitationValid:           validation.CitationValid,
+	}
+}
+
+// copyFindings creates an independent result slice, including citation gate
+// values, while leaving the input findings intact.
+func copyFindings(findings []models.ReviewFinding) []models.ReviewFinding {
+	copied := make([]models.ReviewFinding, len(findings))
+	copy(copied, findings)
+
+	for index := range copied {
+		if copied[index].CitationGateResult == nil {
+			continue
+		}
+
+		gateResult := *copied[index].CitationGateResult
+
+		gateResult.MatchedLines = copyMatchedLines(gateResult.MatchedLines)
+		copied[index].CitationGateResult = &gateResult
+	}
+
+	return copied
+}
+
+// copyMatchedLines duplicates the optional line range retained as citation
+// evidence.
+func copyMatchedLines(lines *models.CitationMatchedLines) *models.CitationMatchedLines {
+	if lines == nil {
+		return nil
+	}
+
+	copied := *lines
+
+	return &copied
+}
+
 // hasMissingCitation checks whether a finding lacks the required citation
-// fields (empty quoted excerpt or empty artifact location).
-func hasMissingCitation(f *models.ReviewFinding) bool {
-	if f.QuotedExcerpt == "" {
-		return true
-	}
-
-	if f.ArtifactLocation.FilePath == "" {
-		return true
-	}
-
-	if f.ArtifactLocation.SectionReference == "" {
-		return true
-	}
-
-	return false
+// fields: a quoted excerpt, file path, or section reference.
+func hasMissingCitation(finding *models.ReviewFinding) bool {
+	return finding.QuotedExcerpt == "" ||
+		finding.ArtifactLocation.FilePath == "" ||
+		finding.ArtifactLocation.SectionReference == ""
 }

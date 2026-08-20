@@ -170,18 +170,18 @@ local linters = new Mapping<String, Group> {
             "go-modernize",
             "go-same-receiver-pointer",
             "go-vet",
-            "golines",
+            // "golines",
           )
         profiles = List("slow")
       }
-      ["golines"] {
-        workspace_indicator = "go.mod"
-        glob = "**/*.go"
-        check =
-          "golines --base-formatter=gofumpt --write-output --max-len=120 --dry-run {{ files }}"
-        fix = "golines --base-formatter=gofumpt --write-output --max-len=120 {{ files }}"
-        profiles = List("slow")
-      }
+      // ["golines"] {
+      //   workspace_indicator = "go.mod"
+      //   glob = "**/*.go"
+      //   check =
+      //     "golines --base-formatter=gofumpt --write-output --max-len=120 --dry-run {{ files }}"
+      //   fix = "golines --base-formatter=gofumpt --write-output --max-len=120 {{ files }}"
+      //   profiles = List("slow")
+      // }
       ["go-mod-tidy"] {
         workspace_indicator = "go.mod"
         glob = "**/*.go"
