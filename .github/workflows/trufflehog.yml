@@ -88,6 +88,7 @@ jobs:
             54.203.187.250:443
             54.213.222.183:443
             api.cloudflare.com:443
+            api.datadoghq.com:443
             api.deps.dev:443
             api.github.com:443
             api.gumroad.com:443

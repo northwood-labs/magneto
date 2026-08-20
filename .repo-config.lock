@@ -57,44 +57,44 @@ source_hash = ''
 dest_hash = 'sha256:8270a3751b6da3c012a2e10dba6c28bd03b49042c459729fc66bda15b4126994'
 
 [files.'.github/workflows/codeql.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:670cc7fac1a8a985618d58ae33cd5fb031feb69e59b86a8536743b2e0cd01598'
+dest_hash = 'sha256:1d1db89589661f15b004b43130f96c7cae171c1e98d1cea3d07e3d1d9f087a26'
 
 [files.'.github/workflows/dependabot-auto-merge.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:19:27Z'
 source_hash = ''
-dest_hash = 'sha256:804886c051c597ec695b4eda71d822de614a8049d244eb9b789e8c164ba79236'
+dest_hash = 'sha256:29492c32b0cde072c6d4bf0d3fead7eda0b3d16358825921afa92270af79a208'
 
 [files.'.github/workflows/dependency-review.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:20bbc2fbedf9e023c69fb9cfca8eec42133a03d66cdffda463f8b895fbbf1439'
+dest_hash = 'sha256:8b4bd21d0dad4975521cedc70bf1d16cdfbfe647f8febec44eb991ca4b524eb1'
 
 [files.'.github/workflows/osv-scanner.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:0f7faba0f1a62e44b05f9d88cf5e7fc7b5ff65ffe74797585d19ebaf69fbab90'
+dest_hash = 'sha256:7928c3d2f3f0b03096423c7e5d5f68ba1f146e648ac1044f19648a05d55de692'
 
 [files.'.github/workflows/scorecard.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:fe020bf3a5abb7f7171f5418c9c334216a8c03dbe81273066c6d92d8a4eebe59'
+dest_hash = 'sha256:df77476399ed977bae96f49826d44cd6fbec7615f2b0304aa5e48aebd8c06626'
 
 [files.'.github/workflows/test.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:5ea6e90c08d4c2e2d0b480dfc4841ef319b5dfaa0e0457d12ac901db251235e4'
+dest_hash = 'sha256:3f623f260d2fc7025ec0c0e1ea009d104c4474ca05da596856c3adf9c85c5500'
 
 [files.'.github/workflows/trufflehog.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:fbdbdb6cc9a1d7a6a842351d8d27df4ab26677579fca9fafd40de80ad555d539'
+dest_hash = 'sha256:b9143ad0f6938a13b1f4a65eeb49137c2defa84656e1c7b0b53121ba89868d81'
 
 [files.'.github/workflows/update-on-push.yml']
-last_sync_time = '2026-08-20T19:56:22Z'
+last_sync_time = '2026-08-20T20:16:15Z'
 source_hash = ''
-dest_hash = 'sha256:69d056f3ecae931eb276e5e0975793905b616e320689d0eca8aea127bd5cd309'
+dest_hash = 'sha256:2902cc190b526a12c709daed9c7c1f7d3d014b34573f027e37bff936b2c0ee0b'
 
 [files.'.github/zizmor.yml']
 last_sync_time = '2026-08-13T20:16:24Z'
