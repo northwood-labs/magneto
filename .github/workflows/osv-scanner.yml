@@ -45,7 +45,7 @@ jobs:
     steps:
       # @config-manager:start harden-runner
       - name: Harden Runner
-        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         # @config-manager:end harden-runner
         # @config-manager:start step-security-hosts
         with:
@@ -182,7 +182,7 @@ jobs:
 
       # @config-manager:start workflow-scanner
       - name: "Run scanner on existing code"
-        uses: google/osv-scanner-action/osv-scanner-action@8deb546fdb875b9996d27d4950be7312dac076a1 # v2.5.0
+        uses: google/osv-scanner-action/osv-scanner-action@a345acffa64b0eaede81a3d9aae6141214d9c8fc # v2.6.0
         continue-on-error: true
         with:
           scan-args: |-
